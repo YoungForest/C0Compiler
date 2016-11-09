@@ -35,5 +35,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="14061213_test.txt" />
+    <Text Include="14061213_out.txt" />
   </ItemGroup>
 </Project>
