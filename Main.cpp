@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 		printf("Wrong arguments.\n");
 		exit(1);
 	}
+	freopen("14061213_out.txt", "w", stdout);
 	filein = fopen(argv[1], "r");
 	testGetsym();
 	fclose(filein);

@@ -50,6 +50,8 @@
 #define NUMBER 35	// 整常数
 
 #define BECOMES 36 // = 赋值
+
+#define ENDOFFILEIN 37 // 文件结束符
 // END 定义 记忆符 和 类别编号
 
 #define WORD_LENGTH (100)			// 最长单词长度

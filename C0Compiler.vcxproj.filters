@@ -33,4 +33,7 @@
   <ItemGroup>
     <None Include="README.md" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="14061213_test.txt" />
+  </ItemGroup>
 </Project>

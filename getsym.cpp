@@ -17,8 +17,7 @@ int sym;                 // 存放最近一次识别出来的token类型
 // 向全局变量ch中读入一个字符, 由语法分析程序getsym调用
 void getChar()
 {
-	if ((ch = getchar()) == EOF)
-		exit(0);
+	ch = fgetc(filein);
 }
 // 清除token字符串缓冲区
 void chearToken()
@@ -171,7 +170,7 @@ int getsym()
 	// 清除 字符缓冲区
 	chearToken();
 	// 跳过所有 空白符
-	while (isSpace() || isNewline() || isTab())
+	while (isSpace() || isNewline() || isTab() || ch == '\0')
 		getChar();
 	// 如果读到的字符是字母
 	if (isLetter())
@@ -271,6 +270,8 @@ int getsym()
 		sym = APOSTROPHE;
 	else if (ch == '\"') // "
 		sym = DOUBLE_QUOTE;
+	else if (ch == EOF)
+		sym = ENDOFFILEIN;
 	else
 		error(2);
 
@@ -281,12 +282,50 @@ int testGetsym()
 {
 	static long count = 0;
 	static char* symbol[] = {
-		"PLUS"
+		"NUL",
+		"PLUS",
+		"SUB",
+		"MULIT",
+		"DIVI",
+		"LSS",
+		"LEQ",
+		"GTR",
+		"GEQ",
+		"NEQ",
+		"EQL",
+		"DOUBLE_QUOTE",
+		"APOSTROPHE",
+		"SEMICOLON",
+		"COMMA",
+		"LPARENT",
+		"RPARENT",
+		"LSQUARE",
+		"RSQUARE",
+		"LCURLY",
+		"RCURLY",
+		"DO",
+		"WHILE",
+		"FOR",
+		"IF",
+		"ELSE",
+		"VOID",
+		"INT",
+		"CHAR",
+		"MAIN",
+		"SCANF",
+		"PRINTF",
+		"RETURN",
+		"CONST",
+		"IDENTIFIER",
+		"NUMBER",
+		"BECOMES",
+		"ENDOFFILEIN"
 	};
 	do
 	{
+		getChar();
 		getsym();
-		printf("%d %d %s\n", ++count, sym, token);
+		printf("%d %s %s\n", ++count, symbol[sym], token);
 	} while (ch != EOF);
 	return 0;
 }
