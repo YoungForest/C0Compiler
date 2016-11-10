@@ -1,9 +1,21 @@
-#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-using namespace std;
+#include "MyHeader.h"
 
-int main()
+FILE *filein;
+
+int main(int argc, char *argv[])
 {
-    cout << "Hello world!" << endl;
-    return 0;
+	if (argc != 2)
+	{
+		printf("Wrong arguments.\n");
+		exit(1);
+	}
+	freopen("14061213_out.txt", "w", stdout);
+	filein = fopen(argv[1], "r");
+	testGetsym();
+	fclose(filein);
+	return 0;
 }
