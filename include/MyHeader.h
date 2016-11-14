@@ -47,14 +47,27 @@
 #define CONST 33	// const
 
 #define IDENTIFIER 34 // 标识符, 具体查看token内容
-#define NUMBER 35	// 整常数
+#define NOT_ZERO_NUMBER 35	// 非零整常数
 
 #define BECOMES 36 // = 赋值
 
 #define ENDOFFILEIN 37 // 文件结束符
+
+#define ZERO_NUMBER 38 // 数字0
 // END 定义 记忆符 和 类别编号
 
 #define WORD_LENGTH (100)			// 最长单词长度
+
+// 符号表
+// 符号类型 kind
+#define CONSTANT 1
+#define VARIABLE 2
+#define FUNCTION 3
+
+// 符号数据类型 type
+#define INT_TYPE 1
+#define CHAR_TYPE 2
+#define VOID_TYPE 3
 
 // 全局变量声明
 extern FILE *filein;

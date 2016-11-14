@@ -189,14 +189,17 @@ int getsym()
 	}
 	else if (isDigit())
 	{	//¶ÁÒ»¸öÊý×Ö
-		while (isDigit())
-		{
-			catToken();
-			getChar();
-		}
-		retract();
+		// while (isDigit())
+		// {
+		// 	catToken();
+		// 	getChar();
+		// }
+		// retract();
 		num = transNum();
-		sym = NUMBER;
+		if(ch == '0')
+			syn = ZERO_NUMBER
+		else
+			sym = NOT_ZERO_NUMBER;
 	}
 	else if (isEqu())	// =
 	{

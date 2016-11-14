@@ -33,10 +33,12 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="Error.cpp" />
-		<Unit filename="MyHeader.h" />
-		<Unit filename="getsym.cpp" />
-		<Unit filename="main.cpp" />
+		<Unit filename="include/MyHeader.h" />
+		<Unit filename="include/SymbolTable.h" />
+		<Unit filename="src/Error.cpp" />
+		<Unit filename="src/SymbolTable.cpp" />
+		<Unit filename="src/getsym.cpp" />
+		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
