@@ -1,8 +1,13 @@
 #include "Laxer.h"
 
-Laxer::Laxer()
+Laxer::Laxer(string filename, Error& _error_handle) :error_handle(_error_handle)
 {
     //ctor
+    infile.open(filename);
+    infile.getline(token, 1024);
+    ll = strlen(token);
+    cc = 0;
+    getch();
 }
 
 Laxer::~Laxer()
@@ -10,6 +15,10 @@ Laxer::~Laxer()
     //dtor
 }
 // 向全局变量ch中读入一个字符, 由语法分析程序getsym调用
+char Laxer::getch()
+{
+    return ch;
+}
 void Laxer::getChar()
 {
     ch = fgetc(filein);
@@ -46,67 +55,67 @@ int Laxer::isDigit()
     return isdigit(ch);
 }
 // 判断ch是否是 逗号
-int isComma()
+int Laxer::isComma()
 {
     return ch == ',';
 }
 // 判断ch是否是 分号
-int isSemi()
+int Laxer::isSemi()
 {
     return ch == ';';
 }
 // 判断ch是否是 等于号
-int isEqu()
+int Laxer::isEqu()
 {
     return ch == '=';
 }
 // 判断ch是否是 小于号
-int isLess()
+int Laxer::isLess()
 {
     return ch == '<';
 }
 // 判断ch是否是 大于号
-int isGreat()
+int Laxer::isGreat()
 {
     return ch == '>';
 }
 // 判断ch是否是 加号
-int isPlus()
+int Laxer::isPlus()
 {
     return ch == '+';
 }
 // 判断ch是否是 减号
-int isMinus()
+int Laxer::isMinus()
 {
     return ch == '-';
 }
 // 判断ch是否是 反斜杠(除号)
-int isDivi()
+int Laxer::isDivi()
 {
     return ch == '/';
 }
 // 判断ch是否是 星号(乘号)
-int isStar()
+int Laxer::isStar()
 {
     return ch == '*';
 }
 // 判断ch是否是 左括号
-int isLpar()
+int Laxer::isLpar()
 {
     return ch == '(';
 }
 // 判断ch是否是 右括号
-int isRpar()
+int Laxer::isRpar()
 {
     return ch == ')';
 }
 // 判断ch是否是 感叹号
-int isExclamation()
+int Laxer::isExclamation()
 {
     return ch == '!';
 }
 // 把字符ch追加到 token 末尾
-void catToken()
+void Laxer::catToken()
 {
     if (indexOfToken >= WORD_LENGTH-1)
     {
@@ -117,12 +126,12 @@ void catToken()
     token[indexOfToken] = '\0';
 }
 // 回退一个字符
-void retract()
+void Laxer::retract()
 {
     ungetc(ch, filein);
 }
 // 判别保留字
-int reserver()
+int Laxer::reserver()
 {
     if (strcmp(token, "do") == 0)
         return DO;
@@ -154,13 +163,13 @@ int reserver()
         return NUL;
 }
 // 将toekn中的 字符数字 转换为 数字
-int transNum()
+int Laxer::transNum()
 {
     return atoi(token);
 }
 
 // 词法分析程序
-int getsym()
+int Laxer::getsym()
 {
     // 清除 字符缓冲区
     chearToken();

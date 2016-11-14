@@ -38,6 +38,7 @@ class Parser
     protected:
     private:
         SymbolTable globalTable;
+        Error error_handler;
 };
 
 #endif // PARSER_H

@@ -28,4 +28,15 @@ class SymbolTable
         int offset = 0;
 };
 
+// 符号表
+// 符号类型 kind
+#define CONSTANT 1
+#define VARIABLE 2
+#define FUNCTION 3
+
+// 符号数据类型 type
+#define INT_TYPE 1
+#define CHAR_TYPE 2
+#define VOID_TYPE 3
+
 #endif // SYMBOLTABLE_H
