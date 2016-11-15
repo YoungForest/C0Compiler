@@ -1,12 +1,19 @@
 #ifndef LAXER_H
 #define LAXER_H
 
+#include "Error.h"
+
+#define WORD_LENGTH (100)           // 最长单词长度
+#define LINEMAX (1024)              // 最长行长度
+
 class Laxer
 {
     public:
         Laxer(string filename, Error &_error_handle);
         virtual ~Laxer();
-        char getch();   // 获取变量ch, 以便Parser可以对Laxer进行底层干预
+
+        string getToken();  // 获取单词
+
         void getChar(); // 向全局变量ch中读入一个字符, 由语法分析程序getsym调用
         void chearToken();  // 清除token字符串缓冲区
         int isSpace();  // 判断ch是否是空格符 
@@ -32,21 +39,23 @@ class Laxer
         int transNum();     // 将toekn中的 字符数字 转换为 数字
         int getsym();       // 词法分析程序
 
+        char ch = ' ';                           // 用于词法分析，存放最近一次从文件中读出的字符
+        int num;                          // 存放最近一次识别出来的数字
+        int linenum;                     // 目前编译到的行数
+        int sym;                 // 存放最近一次识别出来的token类型
+
 
     protected:
     private:
-        char ch;                           // 用于词法分析，存放最近一次从文件中读出的字符
+        char buf[LINEMAX];                  // 读缓冲区
         char token[WORD_LENGTH];            // 存储当前单词
         int indexOfToken = 0;               // 当前的token下标
-        int num;                          // 存放最近一次识别出来的数字
         int cc;                           // 字母计数（列指针）
-        int linenum;                     // 目前编译到的行数
-        int ll;
-        int sym;                 // 存放最近一次识别出来的token类型
+        int ll;                         // 记录行末尾
         Error& error_handle;      // 绑定错误处理程序
+        ifstream infile;    // 读文件流
 };
 
-#define WORD_LENGTH (1025)           // 最长单词长度
 
 // 定义 记忆符 和 类别编号
 #define NUL 0   // 未定义类型
@@ -63,8 +72,8 @@ class Laxer
 #define NEQ 9 // !=
 #define EQL 10 // ==
 
-#define DOUBLE_QUOTE 11 // "
-#define APOSTROPHE 12   // '
+#define STRING 11 // "<字符串>
+#define CHARACTOR 12   // '<字符>
 #define SEMICOLON 13    // ;
 #define COMMA 14        // ,
 #define LPARENT 15      // (
@@ -92,7 +101,7 @@ class Laxer
 #define CONST 33    // const
 
 #define IDENTIFIER 34 // 标识符, 具体查看token内容
-#define NOT_ZERO_NUMBER 35  // 非零整常数
+#define UNSIGNED_INGEGER 35  // 无符号整数
 
 #define BECOMES 36 // = 赋值
 

@@ -1,7 +1,6 @@
 #ifndef SYMBOLTABLE_H
 #define SYMBOLTABLE_H
 
-#include "MyHeader.h"
 #include <map>
 
 struct symbolItem

@@ -1,27 +1,63 @@
+#include <iostream>
+#include <map>
+#include <string>
+#include <ctype.h>
+#include <string.h>
+#include <vector>
+#include <fstream>
+#include <iomanip>
+#include <sstream>
+
 #include "Laxer.h"
+#include "Error.h"
 
 Laxer::Laxer(string filename, Error& _error_handle) :error_handle(_error_handle)
 {
     //ctor
     infile.open(filename);
-    infile.getline(token, 1024);
+    infile.getline(token, LINEMAX);
     ll = strlen(token);
     cc = 0;
-    getch();
+    linenum = 0;
+    getChar();
 }
 
 Laxer::~Laxer()
 {
     //dtor
 }
-// 向全局变量ch中读入一个字符, 由语法分析程序getsym调用
-char Laxer::getch()
+
+string Laxer::getToken()
 {
-    return ch;
+    string str(token);
+    return str;
 }
+
 void Laxer::getChar()
 {
-    ch = fgetc(filein);
+    if (cc == ll) // 如果到达行末尾
+    {
+        if (infile.eof())   // 如果到达文件结束
+        {
+            ch = EOF;
+            return;
+        }
+        infile.getline(buf, LINEMAX);   // 向缓冲区读入新行
+        ll = strlen(buf);   // 更新行长
+        cc = 0;
+        ch = ' ';
+    }
+    else if (cc == 0)
+    {
+        linenum++;
+        ch = buf[cc];
+        cc++;
+    }
+    else
+    {
+        ch = buf[cc];
+        cc++;
+    }
 }
 // 清除token字符串缓冲区
 void Laxer::chearToken()
@@ -162,10 +198,10 @@ int Laxer::reserver()
     else
         return NUL;
 }
-// 将toekn中的 字符数字 转换为 数字
+// 将toekn中的 一个字符数字 转换为 数字(这里的数字只有一位)
 int Laxer::transNum()
 {
-    return atoi(token);
+    return ch - '0';
 }
 
 // 词法分析程序
@@ -184,35 +220,39 @@ int Laxer::getsym()
             catToken();
             getChar();
         }
-        retract();
         int resultValue = reserver();
         if (resultValue == 0) // 读到的 单词不是 保留字, 是未定义字符
             sym = IDENTIFIER;
         else // 读到的单词是保留字
             sym = resultValue;
     }
-    else if (isDigit())
-    {   //读一个数字
-        // while (isDigit())
-        // {
-        //  catToken();
-        //  getChar();
-        // }
-        // retract();
+    else if (isDigit() && ch != '0')
+    {   
+        //读一个数字
+        while (isDigit())
+        {
+         catToken();
+         getChar();
+        }
         num = transNum();
-        if(ch == '0')
-            syn = ZERO_NUMBER
-        else
-            sym = NOT_ZERO_NUMBER;
+        sym = UNSIGNED_INGEGER;
+    }
+    else if (ch == '0')
+    {
+        num = 0;
+        sym = ZERO_NUMBER;
+        getChar();
     }
     else if (isEqu())   // =
     {
         getChar();
         if (isEqu())
+        {
             sym = EQL;
+            getChar();
+        }
         else
         {
-            retract();
             sym = BECOMES;
         }
     }
@@ -220,10 +260,12 @@ int Laxer::getsym()
     {
         getChar();
         if (isEqu())
+        {
             sym = LEQ;  // <=
+            getChar();
+        }
         else
         {
-            retract();
             sym = LSS;  // <
         }
     }
@@ -231,10 +273,12 @@ int Laxer::getsym()
     {
         getChar();
         if (isEqu())
+        {
             sym = GEQ;  // >=
+            getChar();
+        }
         else
         {
-            retract();
             sym = GTR;  // >
         }
     }
@@ -242,45 +286,110 @@ int Laxer::getsym()
     {
         getChar();
         if (isEqu())
-            sym = NEQ;
+        {
+            sym = NEQ;  // !=
+            getChar();
+        }
         else
         {
-            retract();
-            error(2);
+            error_handler.errorMessage(3, linenum, cc);
         }
     }
     else if (isPlus())  // +
+    {
         sym = PLUS;
+        getChar();
+    }
     else if (isMinus()) // -
+    {
         sym = SUB;
+        getChar();
+    }
     else if (isStar())  // *
+    {
         sym = MULIT;
+        getChar();
+    }
     else if (isDivi())  // /
+    {
         sym = DIVI;
+        getChar();
+    }
     else if (isLpar())  // (
+    {
         sym = LPARENT;
+        getChar();
+    }
     else if (isRpar())  // )
+    {
         sym = RPARENT;
+        getChar();
+    }
     else if (ch == '[') // [
+    {
         sym = LSQUARE;
+        getChar();
+    }
     else if (ch == ']') // ]
+    {
         sym = RSQUARE;
+        getChar();
+    }
     else if (ch == '{') // {
+    {
         sym = LCURLY;
+        getChar();
+    }
     else if (ch == '}') // }
+    {
         sym = RCURLY;
+        getChar();
+    }
     else if (isComma()) // ,
+    {
         sym = COMMA;
+        getChar();
+    }
     else if (isSemi())  // ;
+    {
         sym = SEMICOLON;
+        getChar();
+    }
     else if (ch == '\'') // '
-        sym = APOSTROPHE;
+    {
+        sym = NUL;
+        getChar();
+        if (isLetter() || isPlus() || isMinus() || isStar() || isDivi() || isDigit())
+        {
+            getChar();
+            if (ch == '\'')
+            {
+                sym = CHARACTOR;
+                getChar();
+            }
+        }
+    }
     else if (ch == '\"') // "
-        sym = DOUBLE_QUOTE;
+    {
+        sym = NUL;
+        getChar();
+        while (ch != '\"')
+        {
+            getChar();
+            if ((ch <= 126 && ch >= 35) || ch == 32 || ch == 33)
+            {
+                getChar();
+            }
+        }
+        getChar();
+        sym = STRING;
+    }
     else if (ch == EOF)
-        sym = ENDOFFILEIN;
+    {
+        sym = ENDOFFILEIN; // 读到文件末尾
+    }
     else
-        error(2);
+        error_handler.errorMessage(2, linenum, cc, string str(token));
 
     return 0;
 }

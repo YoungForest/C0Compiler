@@ -14,6 +14,7 @@
 				<Option parameters="14061213_test.txt" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="include" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -23,6 +24,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -33,9 +35,16 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="include/Error.h" />
+		<Unit filename="include/Laxer.h" />
 		<Unit filename="include/MyHeader.h" />
+		<Unit filename="include/Parser.h" />
+		<Unit filename="include/QuaterInstr.h" />
 		<Unit filename="include/SymbolTable.h" />
 		<Unit filename="src/Error.cpp" />
+		<Unit filename="src/Laxer.cpp" />
+		<Unit filename="src/Parser.cpp" />
+		<Unit filename="src/QuaterInstr.cpp" />
 		<Unit filename="src/SymbolTable.cpp" />
 		<Unit filename="src/getsym.cpp" />
 		<Unit filename="src/main.cpp" />

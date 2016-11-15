@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "Parser.h"
 
-#include "MyHeader.h"
-
-FILE *filein;
 
 int main(int argc, char *argv[])
 {
@@ -14,8 +12,14 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	freopen("14061213_out.txt", "w", stdout);
-	filein = fopen(argv[1], "r");
-	testGetsym();
-	fclose(filein);
+
+	string filein;
+	filein = argv[1];
+
+	Parser *parser0 = new Parser(filein);
+
+	// filein = fopen(argv[1], "r");
+	// testGetsym();
+	// fclose(filein);
 	return 0;
 }

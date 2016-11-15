@@ -27,6 +27,7 @@ void Error::errorMessage(int errortype,int line, int column) {
     switch (errortype)
     {
         //the function have defined before.
+    case 3: Message << "Find ! which is not followed by =." << endl; break;
     case 14: Message << "程序意外中断" << endl; break;
     case 15:Message << "在语句中出现了无意义字符串" << endl; break;
     case 24: Message << "for语句中出现了非to或downto标识" << endl; break;
@@ -43,7 +44,7 @@ void Error::errorMessage(int errortype,int line, int column) {
     //case 65: Message << "var语句块前有语义不正确的字符串" << endl; break;
     //case 66: Message << "基本类型前有语义不正确的字符串" << endl; break;
     //case 67: Message << "语句块前有语义不正确的字符串" << endl; break;
-    default:
+    default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
     }
     error_messages.push_back(Message.str());
@@ -56,6 +57,8 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
     switch (errortype)
     {
         //the function have defined before.
+    case 101: Message << "Parse error " << message1 << " !" << endl; break;
+    case 2: Message << "Can't recongnize this token" << message1 << endl; break;
     case 6: Message << "程序中有无法识别的字符" << message1 << endl; break;
     case 10: Message << message1 << "不是一个合法的函数声明！" << endl; break;
     case 11: Message << message1 << "不是一个合法的过程声明！" << endl; break;
@@ -80,7 +83,7 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
     case 56: Message << message1 << "形参与实参的类型不匹配！" << endl; break;
     case 57: Message << message1 << "不是过程！" << endl; break;
     case 58: Message << message1 << "下标不正确！" << endl; break;
-    default:
+    default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
     }
     error_messages.push_back(Message.str());
@@ -88,7 +91,7 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
 
 void Error::errorMessage(int errortype, int line, int column, string message1, string message2) {
     stringstream Message;
-    Message << "错误在第 " << line << "行, 第 " << column << "列 :";
+    Message << "错误在第 " << line << "行, 第 " << column << "列 :  ";
     error_count++;
     switch (errortype)
     {
@@ -96,7 +99,7 @@ void Error::errorMessage(int errortype, int line, int column, string message1, s
     case 47: Message << message1 << "是 int,不能直接赋值给 char 变量" << message2 << "！" << endl; break;
     case 48: Message << message1 << "与" << message2 << "类型不是int 或 char，不能参与运算！" << endl; break;
     case 9: Message << "本该是" << message1 << " 在程序中却是" << message2 << endl; break;
-    default:
+    default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
     }
     error_messages.push_back(Message.str());
