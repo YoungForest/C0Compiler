@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 		printf("Wrong arguments.\n");
 		exit(1);
 	}
-//	freopen("14061213_out.txt", "w", stdout);
+	freopen("14061213_out.txt", "w", stdout);
 
 	string filein;
 	filein = argv[1];

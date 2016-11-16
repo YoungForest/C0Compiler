@@ -17,7 +17,7 @@ class Laxer
         std::string getToken();  // 获取单词
 
         void getChar(); // 向全局变量ch中读入一个字符, 由语法分析程序getsym调用
-        void chearToken();  // 清除token字符串缓冲区
+        void clearToken();  // 清除token字符串缓冲区
         int isSpace();  // 判断ch是否是空格符
         int isNewline();    // 判断ch是否是 换行符 或 回车符
         int isTab();    // 判断ch是否是 制表符tab
@@ -45,14 +45,13 @@ class Laxer
         int num;                          // 存放最近一次识别出来的数字
         int linenum;                     // 目前编译到的行数
         int sym;                 // 存放最近一次识别出来的token类型
-
+        int cc;                           // 字母计数（列指针）
 
     protected:
     private:
         char buf[LINEMAX];                  // 读缓冲区
         char token[WORD_LENGTH];            // 存储当前单词
         int indexOfToken;               // 当前的token下标
-        int cc;                           // 字母计数（列指针）
         int ll;                         // 记录行末尾
         Error& error_handle;      // 绑定错误处理程序
         std::ifstream infile;    // 读文件流

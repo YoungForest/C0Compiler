@@ -1,5 +1,3 @@
-#define _GLIBCXX_USE_CXX11_ABI 0
-
 #include <iostream>
 #include <map>
 #include <string>
@@ -19,12 +17,13 @@ Laxer::Laxer(string filename, Error& _error_handle) :error_handle(_error_handle)
 {
     //ctor
     infile.open(filename.c_str());
-    infile.getline(token, LINEMAX);
-    ll = strlen(token);
+    infile.getline(buf, LINEMAX);
+    ll = strlen(buf);
     cc = 0;
+    clearToken();
     indexOfToken = 0;
     ch = ' ';
-    linenum = 0;
+    linenum = 1;
     getChar();
 };
 
@@ -41,6 +40,7 @@ string Laxer::getToken()
 
 void Laxer::getChar()
 {
+    // cout << cc << endl;
     if (cc == ll) // 如果到达行末尾
     {
         if (infile.eof())   // 如果到达文件结束
@@ -50,12 +50,12 @@ void Laxer::getChar()
         }
         infile.getline(buf, LINEMAX);   // 向缓冲区读入新行
         ll = strlen(buf);   // 更新行长
+        linenum++;
         cc = 0;
         ch = ' ';
     }
     else if (cc == 0)
     {
-        linenum++;
         ch = buf[cc];
         cc++;
     }
@@ -66,7 +66,7 @@ void Laxer::getChar()
     }
 }
 // 清除token字符串缓冲区
-void Laxer::chearToken()
+void Laxer::clearToken()
 {
     token[0] = '\0';
     indexOfToken = 0;
@@ -162,7 +162,7 @@ void Laxer::catToken()
     if (indexOfToken >= WORD_LENGTH-1)
     {
         printf("Word %s is too loog than %d.\n", token, WORD_LENGTH);
-        chearToken();
+        clearToken();
     }
     token[indexOfToken++] = ch;
     token[indexOfToken] = '\0';
@@ -199,7 +199,7 @@ int Laxer::reserver()
         return SCANF;
     else if (strcmp(token, "printf") == 0)
         return PRINTF;
-    else if (strcmp(token, " return") == 0)
+    else if (strcmp(token, "return") == 0)
         return RETURN;
     else if (strcmp(token, "const") == 0)
         return CONST;
@@ -216,7 +216,7 @@ int Laxer::transNum()
 int Laxer::getsym()
 {
     // 清除 字符缓冲区
-    chearToken();
+    clearToken();
     // 跳过所有 空白符
     while (isSpace() || isNewline() || isTab() || ch == '\0')
         getChar();

@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Option parameters="14061213_test.txt" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add directory="include" />
 				</Compiler>

@@ -13,6 +13,7 @@ class Parser
         virtual ~Parser();
 
         void parser();
+        void functionIn(std::string s);
         void parserTestPrint(std::string s);  // 语法分析程序测试程序, 输出 语法成分
         void test(SymbolTable st);  // 检查词法分析程序得到的标识符是否有效
 
