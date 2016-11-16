@@ -2,6 +2,8 @@
 #define LAXER_H
 
 #include "Error.h"
+#include <string>
+#include <fstream>
 
 #define WORD_LENGTH (100)           // 最长单词长度
 #define LINEMAX (1024)              // 最长行长度
@@ -9,14 +11,14 @@
 class Laxer
 {
     public:
-        Laxer(string filename, Error &_error_handle);
+        Laxer(std::string filename, Error &_error_handle);
         virtual ~Laxer();
 
-        string getToken();  // 获取单词
+        std::string getToken();  // 获取单词
 
         void getChar(); // 向全局变量ch中读入一个字符, 由语法分析程序getsym调用
         void chearToken();  // 清除token字符串缓冲区
-        int isSpace();  // 判断ch是否是空格符 
+        int isSpace();  // 判断ch是否是空格符
         int isNewline();    // 判断ch是否是 换行符 或 回车符
         int isTab();    // 判断ch是否是 制表符tab
         int isLetter(); // 判断ch是否是字母, 包括 下划线
@@ -39,7 +41,7 @@ class Laxer
         int transNum();     // 将toekn中的 字符数字 转换为 数字
         int getsym();       // 词法分析程序
 
-        char ch = ' ';                           // 用于词法分析，存放最近一次从文件中读出的字符
+        char ch;                           // 用于词法分析，存放最近一次从文件中读出的字符
         int num;                          // 存放最近一次识别出来的数字
         int linenum;                     // 目前编译到的行数
         int sym;                 // 存放最近一次识别出来的token类型
@@ -49,11 +51,11 @@ class Laxer
     private:
         char buf[LINEMAX];                  // 读缓冲区
         char token[WORD_LENGTH];            // 存储当前单词
-        int indexOfToken = 0;               // 当前的token下标
+        int indexOfToken;               // 当前的token下标
         int cc;                           // 字母计数（列指针）
         int ll;                         // 记录行末尾
         Error& error_handle;      // 绑定错误处理程序
-        ifstream infile;    // 读文件流
+        std::ifstream infile;    // 读文件流
 };
 
 

@@ -3,11 +3,10 @@
 SymbolTable::SymbolTable()
 {
     //ctor
-    symbolList = new std::list<symbol>();
+    offset = 0;
 }
 
 SymbolTable::~SymbolTable()
 {
     //dtor
-    delete(symbolList);
 }

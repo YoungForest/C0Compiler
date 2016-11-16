@@ -37,7 +37,6 @@
 		</Compiler>
 		<Unit filename="include/Error.h" />
 		<Unit filename="include/Laxer.h" />
-		<Unit filename="include/MyHeader.h" />
 		<Unit filename="include/Parser.h" />
 		<Unit filename="include/QuaterInstr.h" />
 		<Unit filename="include/SymbolTable.h" />
@@ -46,7 +45,6 @@
 		<Unit filename="src/Parser.cpp" />
 		<Unit filename="src/QuaterInstr.cpp" />
 		<Unit filename="src/SymbolTable.cpp" />
-		<Unit filename="src/getsym.cpp" />
 		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />

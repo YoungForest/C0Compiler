@@ -1,5 +1,6 @@
 #include "Error.h"
 #include <sstream>
+#include <iostream>
 
 using namespace std;
 
@@ -18,7 +19,7 @@ int Error::getErrorCount() {
     return error_count;
 }
 
-bool Error::IsSuccess() {
+bool Error::isSuccess() {
     return error_count == 0;
 }
 

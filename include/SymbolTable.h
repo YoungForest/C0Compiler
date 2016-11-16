@@ -2,11 +2,12 @@
 #define SYMBOLTABLE_H
 
 #include <map>
+#include <string>
 #include "Laxer.h"
 
 struct symbolItem
 {
-    String name; // 标识符名字
+    std::string name; // 标识符名字
     int line;   // 声明行数
     int kind;   // 符号的类型, 常量, 变量, 函数, 变量数组, 参数
     int type;   // int or char or void
@@ -19,13 +20,13 @@ class SymbolTable
         SymbolTable();  // 构造函数
         virtual ~SymbolTable(); // 析构函数
 
-        struct symbolItem searchItem(string name);
-        bool insertItem(string name, int line, int kind, int type, int val = 0, int length = 1)
+        struct symbolItem searchItem(std::string name);
+        bool insertItem(std::string name, int line, int kind, int type, int val = 0, int length = 1);
 
     protected:
     private:
-        std::map<string, struct symbolItem> symbolList;
-        int offset = 0;
+        std::map<std::string, struct symbolItem> symbolList;
+        int offset;
 };
 
 // 符号表

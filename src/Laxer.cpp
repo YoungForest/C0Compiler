@@ -1,3 +1,5 @@
+#define _GLIBCXX_USE_CXX11_ABI 0
+
 #include <iostream>
 #include <map>
 #include <string>
@@ -11,16 +13,20 @@
 #include "Laxer.h"
 #include "Error.h"
 
+using namespace std;
+
 Laxer::Laxer(string filename, Error& _error_handle) :error_handle(_error_handle)
 {
     //ctor
-    infile.open(filename);
+    infile.open(filename.c_str());
     infile.getline(token, LINEMAX);
     ll = strlen(token);
     cc = 0;
+    indexOfToken = 0;
+    ch = ' ';
     linenum = 0;
     getChar();
-}
+};
 
 Laxer::~Laxer()
 {
@@ -162,10 +168,12 @@ void Laxer::catToken()
     token[indexOfToken] = '\0';
 }
 // 回退一个字符
+/*
 void Laxer::retract()
 {
     ungetc(ch, filein);
 }
+*/
 // 判别保留字
 int Laxer::reserver()
 {
@@ -227,7 +235,7 @@ int Laxer::getsym()
             sym = resultValue;
     }
     else if (isDigit() && ch != '0')
-    {   
+    {
         //读一个数字
         while (isDigit())
         {
@@ -292,7 +300,7 @@ int Laxer::getsym()
         }
         else
         {
-            error_handler.errorMessage(3, linenum, cc);
+            error_handle.errorMessage(3, linenum, cc);
         }
     }
     else if (isPlus())  // +
@@ -389,7 +397,10 @@ int Laxer::getsym()
         sym = ENDOFFILEIN; // 读到文件末尾
     }
     else
-        error_handler.errorMessage(2, linenum, cc, string str(token));
+    {
+        string str(token);
+        error_handle.errorMessage(2, linenum, cc, str);
+    }
 
     return 0;
 }

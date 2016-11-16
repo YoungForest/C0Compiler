@@ -2,11 +2,10 @@
 #include "Error.h"
 #include "SymbolTable.h"
 #include <ctype.h>
+#include <string>
+#include <iostream>
 
-Parser::Parser()
-{
-    //ctor
-}
+using namespace std;
 
 Parser::~Parser()
 {
@@ -15,28 +14,34 @@ Parser::~Parser()
 
 void Parser::parserTestPrint(string s)
 {
-    std::cout << "This is a " << s << " ! " endl;
+    cout << "This is a " << s << " ! " << endl;
+}
+
+void Parser::parser()
+{
+    laxer.getsym();
+    program();
 }
 
 void Parser::program()
 {
     if (laxer.sym == CONST)
-        constantDenote(globalTable);
+        constantDenote(&globalTable);
     while (laxer.sym == INT || laxer.sym == CHAR)
     {
-        int type = laxer.sys;
+        int type = laxer.sym;
         laxer.getsym();
         if(laxer.sym == IDENTIFIER)
         {
-            string iden = laxer.getToken();
+            string ident = laxer.getToken();
             laxer.getsym();
             if (laxer.sym == SEMICOLON || laxer.sym == COMMA || laxer.sym == LSQUARE)
             {
-                varietyDenote(globalTable, type, ident);
+                varietyDenote(&globalTable, type, ident);
             }
             else if (laxer.sym == LPARENT)
             {
-                defineReturnFunction(type, indent);
+                defineReturnFunction(type, ident);
                 break;
             }
             else
@@ -67,14 +72,21 @@ void Parser::program()
                 if (laxer.sym == IDENTIFIER)
                 {
                     string ident = laxer.getToken();
-                    laxer.getsym(); 
+                    laxer.getsym();
                     defineReturnFunction(type, ident);
                 }
             }
         }
         else
         {
-            defineReturnFunction();
+            int type = laxer.sym;
+            laxer.getsym();
+            if (laxer.sym == IDENTIFIER)
+            {
+                string ident = laxer.getToken();
+                laxer.getsym();
+                defineReturnFunction(type, ident);
+            }
         }
     }
 }
@@ -122,7 +134,7 @@ void Parser::defineReturnFunction(int type, string ident)
                 if (laxer.sym == RCURLY)
                 {
                     laxer.getsym();
-                    parserTestPrint("return function define")
+                    parserTestPrint("return function define");
                 }
             }
         }
@@ -133,11 +145,11 @@ void Parser::compoundStatement()
 {
     if (laxer.sym == CONST)
     {
-        constantDenote(localTable);
+        constantDenote(&localTable);
     }
     if (laxer.sym == INT || laxer.sym == CHAR)
     {
-        varietyDenote(localTable);
+        varietyDenote(&localTable);
     }
     statementList();
     parserTestPrint("compound statement");
@@ -331,7 +343,7 @@ void Parser::integer()
         laxer.getsym();
     }
     else
-        ; 
+        ;
     if(laxer.sym == ZERO_NUMBER)
     {
         laxer.getsym();
@@ -344,7 +356,7 @@ void Parser::integer()
     }
     else
         ;
-} 
+}
 
 void Parser::statement()
 {
@@ -404,7 +416,7 @@ void Parser::statement()
     else if (laxer.sym == IDENTIFIER)
     {
         laxer.getsym();
-        ident = laxer.getToken();
+        string ident = laxer.getToken();
         if (laxer.sym == BECOMES || laxer.sym == LSQUARE)
         {
             assignStatement(ident);
@@ -493,7 +505,7 @@ void Parser::doCycleStatement()
 
 void Parser::forCycleStatement()
 {
-    if (laxer.sym = FOR)
+    if (laxer.sym == FOR)
     {
         laxer.getsym();
         if (laxer.sym == LPARENT)
@@ -525,11 +537,14 @@ void Parser::forCycleStatement()
                                         if (laxer.sym == PLUS || laxer.sym == SUB)
                                         {
                                             laxer.getsym();
-                                            step();
-                                            if (laxer.sym == RPARENT)
+                                            if (laxer.sym == UNSIGNED_INGEGER)
                                             {
                                                 laxer.getsym();
-                                                statement();
+                                                if (laxer.sym == RPARENT)
+                                                {
+                                                    laxer.getsym();
+                                                    statement();
+                                                }
                                             }
                                         }
                                     }
@@ -544,54 +559,46 @@ void Parser::forCycleStatement()
     }
 }
 
-void Parser::assignStatement()
+void Parser::assignStatement(string ident)
 {
-    if (laxer.sym == IDENTIFIER)
+    if (laxer.sym == BECOMES)
     {
         laxer.getsym();
-        if (laxer.sym == BECOMES)
+        expression();
+    }
+    else if (laxer.sym == LSQUARE)
+    {
+        laxer.getsym();
+        expression();
+        if (laxer.sym == RSQUARE)
         {
             laxer.getsym();
-            expression();
-        }
-        else if (laxer.sym == LSQUARE)
-        {
-            laxer.getsym();
-            expression();
-            if (laxer.sym == RSQUARE)
+            if (laxer.sym == BECOMES)
             {
                 laxer.getsym();
-                if (laxer.sym == BECOMES)
-                {
-                    laxer.getsym();
-                    expression();
-                }
+                expression();
             }
         }
-        else
-        {
-
-        }
-        parserTestPrint("assign statement");
     }
+    else
+    {
+
+    }
+    parserTestPrint("assign statement");
 }
 
-void Parser::callFunction()
+void Parser::callFunction(string ident)
 {
-    if (laxer.sym == IDENTIFIER)
+    if (laxer.sym == LPARENT)
     {
         laxer.getsym();
-        if (laxer.sym == LPARENT)
+        valueParameterTable();
+        if (laxer.sym == RPARENT)
         {
-            laxer.getsym();
-            valueParameterTable();
-            if (laxer.sym == RPARENT)
-            {
 
-            }
         }
-        parserTestPrint("function call");
     }
+    parserTestPrint("function call");
 }
 
 void Parser::valueParameterTable()
@@ -672,11 +679,11 @@ void Parser::write()
                 expression();
                 if (laxer.sym == RPARENT)
                 {
-                    laxer.getsym();   
+                    laxer.getsym();
                 }
             }
-        }  
-        parserTestPrint("write statement"); 
+        }
+        parserTestPrint("write statement");
     }
 }
 
@@ -728,7 +735,7 @@ void Parser::factor()
         }
         else if (laxer.sym == LPARENT)
         {
-            callFunction2(ident);
+            callFunction(ident);
         }
     }
     else if (laxer.sym == CHARACTOR)
