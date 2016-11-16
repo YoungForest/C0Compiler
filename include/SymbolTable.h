@@ -2,6 +2,7 @@
 #define SYMBOLTABLE_H
 
 #include <map>
+#include "Laxer.h"
 
 struct symbolItem
 {
@@ -34,8 +35,8 @@ class SymbolTable
 #define FUNCTION 3
 
 // 符号数据类型 type
-#define INT_TYPE 1
-#define CHAR_TYPE 2
-#define VOID_TYPE 3
+#define INT_TYPE INT
+#define CHAR_TYPE CHAR
+#define VOID_TYPE VOID
 
 #endif // SYMBOLTABLE_H

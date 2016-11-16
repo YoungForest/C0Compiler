@@ -1,6 +1,8 @@
 #include "Error.h"
 #include <sstream>
 
+using namespace std;
+
 Error::Error()
 {
     //ctor
