@@ -3,6 +3,7 @@
 
 #include "Laxer.h"
 #include "SymbolTable.h"
+#include "MiddleCode.h"
 #include "Error.h"
 #include <string>
 
@@ -15,13 +16,13 @@ class Parser
         void parser();
         void functionIn(std::string s);
         void parserTestPrint(std::string s);  // 语法分析程序测试程序, 输出 语法成分
-        void test(SymbolTable st);  // 检查词法分析程序得到的标识符是否有效
+        void enterTable(SymbolTable *table, string name, int kind, int type, int valueoroffset, int length);  // 登录符号表
 
         char charactor();   // <字符>    ::=  '<加法运算符>'｜'<乘法运算符>'｜'<字母>'｜'<数字>'
         void program(); // <程序>    ::= ［<常量说明>］［<变量说明>］{<有返回值函数定义>|<无返回值函数定义>}<主函数>
         void constantDenote(SymbolTable *table);    // <常量说明> ::=  const<常量定义>;{ const<常量定义>;}
         void constantDefine(SymbolTable *table);    // <常量定义>   ::=   int<标识符>＝<整数>{,<标识符>＝<整数>} | char<标识符>＝<字符>{,<标识符>＝<字符>}
-        void integer();  // <整数>        ::= ［+｜-］<无符号整数>｜０
+        int integer();  // <整数>        ::= ［+｜-］<无符号整数>｜０
 
         void varietyDenote(SymbolTable *table); // <变量说明>  ::= <变量定义>;{<变量定义>;}
         void varietyDenote(SymbolTable *table, int type, std::string ident); // <变量说明>  ::= <变量定义>;{<变量定义>;}
@@ -65,6 +66,7 @@ class Parser
     private:
         SymbolTable globalTable;
         SymbolTable localTable;
+        MiddleCode middleCode;
         Error error_handler;
         Laxer laxer;
 };

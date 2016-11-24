@@ -2,63 +2,36 @@
 #define QUATERINSTR_H
 
 #include <string>
+#include "SymbolTable.h"
 
 enum Opcode {
-	ADD,
-	SUB,
-	MUL,
-	DIV,
-	NEG,
-	//calculate instructions.
-	//>
-	BGR,
-	//>=
-	BGE,
-	//<
-	BLS,
-	//<=
-	BLE,
-	//==
-	BEQ,
-	//<>
-	BNE,
-	//branch if meeting the conditions.
+	// 算术运算符
+	ADD,	// +
+	SUB,	// -
+	MUL,	// *
+	DIV,	// /
+	NEG,	// -
 
-	// des = src
-	ASS,
-	// [des] = src
-	ASSADD,
-	// temp = add of array + offset
-	ARRADD,
-	// des = [src]
-	ARRASS,
+	// 分支跳转
+	BGT,	// >
+	BGE,	// >=
+	BLT,	// <
+	BLE,	// <=
+	BEQ,	// ==
+	BNE,	// !=
 
 
-	JUMP,
-	SETL,
-	READ,
-	WRITE,
-	BEGIN,
-	END,
+	ASS,	// 赋值
 
-	CALL,
-	/*
-	as a result of not knowing offset in generating
-	quaters.So we can't get the address of the vairable
-	or the parameters.So we must generate a push var
-	to do this.
+	JUMP,	// 无条件跳转
 
-	*/
-	PUSH,
-	PUSHVAR,
+	SET,	// 标签设置
 
-	//increment +1
-	INC,
-	//decrement -1
-	DEC,
+	CALL,	// 函数调用
+	RETURN, // 函数返回
 
-	RETURN
-
+	READ,	// 读操作
+	WRITE,	// 写操作
 };
 
 class QuaterInstr
@@ -66,12 +39,17 @@ class QuaterInstr
     public:
         QuaterInstr();
         virtual ~QuaterInstr();
+
+        QuaterInstr(Opcode _op, struct symbolItem* des, struct symbolItem* src1, struct symbolItem* src2);
+        void printQuater();
+        string getOpcode();
+
+        Opcode op;
+        struct symbolItem* des;
+        struct symbolItem* src1;
+        struct symbolItem* src2;
     protected:
     private:
-        Opcode op;
-        std::string des;
-        std::string src1;
-        std::string src2;
 };
 
 #endif // QUATERINSTR_H

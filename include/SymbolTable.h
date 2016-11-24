@@ -21,7 +21,8 @@ class SymbolTable
         virtual ~SymbolTable(); // Îö¹¹º¯Êý
 
         struct symbolItem searchItem(std::string name);
-        bool insertItem(std::string name, int line, int kind, int type, int val = 0, int length = 1);
+        struct symbolItem insertItem(std::string name, int line, int kind, int type, int val = 0, int length = 1);
+        struct symbolItem generateTemp();
 
     protected:
     private:

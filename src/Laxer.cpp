@@ -239,8 +239,8 @@ int Laxer::getsym()
         //读一个数字
         while (isDigit())
         {
-         catToken();
-         getChar();
+            catToken();
+            getChar();
         }
         num = transNum();
         sym = UNSIGNED_INGEGER;
@@ -369,6 +369,7 @@ int Laxer::getsym()
         getChar();
         if (isLetter() || isPlus() || isMinus() || isStar() || isDivi() || isDigit())
         {
+            catToken();
             getChar();
             if (ch == '\'')
             {

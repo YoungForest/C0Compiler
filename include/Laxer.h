@@ -46,11 +46,11 @@ class Laxer
         int linenum;                     // 目前编译到的行数
         int sym;                 // 存放最近一次识别出来的token类型
         int cc;                           // 字母计数（列指针）
-
+        char token[WORD_LENGTH];            // 存储当前单词
+        
     protected:
     private:
         char buf[LINEMAX];                  // 读缓冲区
-        char token[WORD_LENGTH];            // 存储当前单词
         int indexOfToken;               // 当前的token下标
         int ll;                         // 记录行末尾
         Error& error_handle;      // 绑定错误处理程序

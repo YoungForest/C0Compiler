@@ -17,9 +17,23 @@ void Parser::parserTestPrint(string s)
     cout << "Line : " << laxer.linenum << " column : " << laxer.cc << ".   This is a " << s << " ! " << endl;
 }
 
+// 调试
 void Parser::functionIn(string s)
 {
     // cout << "Function in " << s << endl;
+}
+
+struct symbolItem Parser::test(SymbolTable st, std::string ident)
+{
+    struct symbolItem re = st.searchItem(ident);
+    if (re == NULL)
+        error_handler.errorMessage(2, linenum, cc);
+    return re;
+}
+
+void Parser::enterTable(SymbolTable *table, string name, int kind, int type, int valueoroffset = 0, int length = 0)
+{
+    table->insertItem(name, laxer.linenum, kind, type, valueoroffset, length);
 }
 
 void Parser::parser()
@@ -306,18 +320,24 @@ void Parser::constantDenote(SymbolTable *table)
 void Parser::constantDefine(SymbolTable *table)
 {
     functionIn("constantDefine");
+    int type, value;
+    int kind = CONSTANT;
+    string name;
     if (laxer.sym == INT)
     {
+        type = INT_TYPE;
         do
         {
             laxer.getsym();
             if (laxer.sym == IDENTIFIER)
             {
+                name = laxer.getToken();
                 laxer.getsym();
                 if (laxer.sym == BECOMES)
                 {
                     laxer.getsym();
-                    integer();
+                    value = integer();
+                    enterTable(table, name, kind, type, value);
                 }
             }
         }
@@ -326,6 +346,7 @@ void Parser::constantDefine(SymbolTable *table)
     }
     else if (laxer.sym == CHAR)
     {
+        type = CHAR_TYPE;
         do
         {
             laxer.getsym();
@@ -338,6 +359,8 @@ void Parser::constantDefine(SymbolTable *table)
                     if (laxer.sym == CHARACTOR)
                     {
                         laxer.getsym();
+                        value = laxer.token[0];
+                        enterTable(table, name, kind, type, value);
                     }
                 }
             }
@@ -347,7 +370,7 @@ void Parser::constantDefine(SymbolTable *table)
     }
 }
 
-void Parser::integer()
+int Parser::integer()
 {
     functionIn("integer");
     if (laxer.sym == PLUS)
@@ -364,11 +387,13 @@ void Parser::integer()
     {
         laxer.getsym();
         parserTestPrint("integer");
+        return 0;
     }
     else if (laxer.sym == UNSIGNED_INGEGER)
     {
         laxer.getsym();
         parserTestPrint("integer");
+        return laxer.num;
     }
     else
         ;
@@ -731,29 +756,47 @@ void Parser::returnStatement()
     }
 }
 
-void Parser::expression()
+struct symbolItem Parser::expression()
 {
     functionIn("expression");
+    bool minus = false;
     if (laxer.sym == PLUS || laxer.sym == SUB)
     {
+        if (laxer.sym == SUB)
+            minus = true;
         laxer.getsym();
     }
-    item();
+    struct symbolItem item1 = item();
     // cout << laxer.sym << endl;
     while (laxer.sym == PLUS || laxer.sym == SUB)
     {
+        bool add;
+        if (laxer.sym == PLUS)
+            add = true;
+        else
+            add = false;
         laxer.getsym();
-        item();
+        struct symbolItem item2 = item();
+        if (add)
+            middleCode.gen(Opcode::ADD, item1, item1, item2);
+        else
+            middleCode.gen(Opcode::SUB, item1, item1, item2);
     }
+    if (minus)
+        middleCode.gen(Opcode::NEG, item1);
     parserTestPrint("expression");
+    return item1;
 }
 
-void Parser::factor()
+struct symbolItem Parser::factor()
 {
     functionIn("factor");
+    struct symbolItem re;
     if (laxer.sym ==IDENTIFIER)
     {
         string ident = laxer.getToken();
+        re = localTable.searchItem(ident);
+
         laxer.getsym();
         if (laxer.sym == LSQUARE)
         {
@@ -770,7 +813,6 @@ void Parser::factor()
         }
         else
         {
-
         }
     }
     else if (laxer.sym == CHARACTOR)
@@ -797,14 +839,24 @@ void Parser::factor()
     parserTestPrint("factor");
 }
 
-void Parser::item()
+struct symbolItem Parser::item()
 {
     functionIn("item");
-    factor();
+    struct symbolItem item1 = factor();
     while (laxer.sym == MULIT || laxer.sym == DIVI)
     {
+        bool mul;
+        if (laxer.sym == MULIT)
+            mul = true;
+        else
+            mul = false;
         laxer.getsym();
-        factor();
+        struct symbolItem item2 = factor();
+        if (mul)
+            middleCode.gen(Opcode::MUL, item1, item1, item2);
+        else
+            middleCode.gen(Opcode::DIV, item1, item1. item2);
     }
     parserTestPrint("item");
+    return item1;
 }
