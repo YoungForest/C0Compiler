@@ -16,9 +16,10 @@ class Parser
         void parser();
         void functionIn(std::string s);
         void parserTestPrint(std::string s);  // 语法分析程序测试程序, 输出 语法成分
+		struct symbolItem* test(SymbolTable* st, std::string ident);	// 测试标识符是否在符号表中
         void enterTable(SymbolTable *table, std::string name, int kind, int type, int valueoroffset, int length);  // 登录符号表
 
-        char charactor();   // <字符>    ::=  '<加法运算符>'｜'<乘法运算符>'｜'<字母>'｜'<数字>'
+        // delete, because distribe this task to lexer char charactor();   // <字符>    ::=  '<加法运算符>'｜'<乘法运算符>'｜'<字母>'｜'<数字>'
         void program(); // <程序>    ::= ［<常量说明>］［<变量说明>］{<有返回值函数定义>|<无返回值函数定义>}<主函数>
         void constantDenote(SymbolTable *table);    // <常量说明> ::=  const<常量定义>;{ const<常量定义>;}
         void constantDefine(SymbolTable *table);    // <常量定义>   ::=   int<标识符>＝<整数>{,<标识符>＝<整数>} | char<标识符>＝<字符>{,<标识符>＝<字符>}
@@ -36,12 +37,9 @@ class Parser
         void parameterTable();  // <参数表>    ::=  <类型标识符><标识符>{,<类型标识符><标识符>}| <空>
         void mainFunction();    // <主函数>    ::= void main‘(’‘)’ ‘{’<复合语句>‘}’
 
-        // struct symbolItem* item();  // <因子>{<乘法运算符><因子>}
-        void item();
-        // struct symbolItem* expression();    // <表达式>    ::= ［＋｜－］<项>{<加法运算符><项>}
-        void expression();
-        // struct symbolItem* factor();    // <因子>    ::= <标识符>｜<标识符>‘[’<表达式>‘]’｜<整数>|<字符>｜<有返回值函数调用语句>|‘(’<表达式>‘)’
-        void factor();
+        struct symbolItem* item();  // <因子>{<乘法运算符><因子>}
+        struct symbolItem* expression();    // <表达式>    ::= ［＋｜－］<项>{<加法运算符><项>}
+        struct symbolItem* factor();    // <因子>    ::= <标识符>｜<标识符>‘[’<表达式>‘]’｜<整数>|<字符>｜<有返回值函数调用语句>|‘(’<表达式>‘)’
 
         void statement();   // <语句>    ::= <条件语句>｜<循环语句>｜‘{’<语句列>‘}’｜<函数调用语句>;｜<赋值语句>;｜<读语句>;｜<写语句>;｜<空>;｜<返回语句>;
         void assignStatement(std::string ident); // <赋值语句>   ::=  <标识符>＝<表达式>|<标识符>‘[’<表达式>‘]’=<表达式>
@@ -50,12 +48,12 @@ class Parser
         void condition();
         void doCycleStatement();  // <do循环语句>   ::=  for‘(’<标识符>＝<表达式>;<条件>;<标识符>＝<标识符>(+|-)<步长>‘)’<语句>
         void forCycleStatement();  // <for循环语句>   ::=  for‘(’<标识符>＝<表达式>;<条件>;<标识符>＝<标识符>(+|-)<步长>‘)’<语句>
-        int step(); // <步长>::= <无符号整数>
+        //int step(); // <步长>::= <无符号整数> 简化掉了
 
-        void callFunction(std::string ident);    // <函数调用语句> ::= <标识符>‘(’<值参数表>‘)’
-        // struct symbolItem* callReturnFunction();    // <有返回值函数调用语句> ::= <标识符>‘(’<值参数表>‘)’
-        void callReturnFunction();
-        void callVoidFunction();    // <无返回值函数调用语句> ::= <标识符>‘(’<值参数表>‘)’
+		// 由符号表检查是否有返回值
+        //void callFunction(std::string ident);    // <函数调用语句> ::= <标识符>‘(’<值参数表>‘)’
+        struct symbolItem* callFunction(std::string ident);   // <有返回值函数调用语句> ::= <标识符>‘(’<值参数表>‘)’
+        // <无返回值函数调用语句> ::= <标识符>‘(’<值参数表>‘)’
         void valueParameterTable(); // <值参数表>   ::= <表达式>{,<表达式>}｜<空>
         void statementList();   // <语句列>   ::=｛<语句>｝
         void read();    // <读语句>    ::=  scanf ‘(’<标识符>{,<标识符>}‘)’

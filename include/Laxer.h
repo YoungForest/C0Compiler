@@ -62,7 +62,7 @@ class Laxer
 #define NUL 0   // 未定义类型
 
 #define PLUS 1  // +
-#define SUB 2   // -
+#define MINUS 2   // -
 #define MULIT 3 // *
 #define DIVI 4 // /
 

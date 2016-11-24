@@ -1,7 +1,8 @@
 #include "QuaterInstr.h"
+#include "sstream"
+#include <iostream>
 
 using namespace std;
-#include "sstream"
 
 QuaterInstr::QuaterInstr()
 {
@@ -38,26 +39,28 @@ string QuaterInstr::getOpcode()
 {
     switch (op)
         {
-        case ADD:return "ADD";
-        case SUB:return "SUB";
-        case MUL:return "MUL";
-        case DIV:return "DIV";
-        case NEG:return "NEG";
-        case BGT:return "BGT";
-        case BGE:return "BGE";
-        case BLT:return "BLT";
-        case BLE:return "BLE";
-        case BEQ:return "BEQ";
-        case BNE:return "BNE";
-        case ASS:return "ASS";
-        case JUMP:return "JUMP";
-        case SET:return "SET";
-        case CALL:return "CALL"
-        case RETURN:return "RETURN";
-        case READ:return "READ";
-        case WRITE:return "WRITE";
-        default:
-            return "NULL";
-            break;
+			case ADD:return "ADD";
+			case SUB:return "SUB";
+			case MUL:return "MUL";
+			case DIV:return "DIV";
+			case NEG:return "NEG";
+			case BGT:return "BGT";
+			case BGE:return "BGE";
+			case BLT:return "BLT";
+			case BLE:return "BLE";
+			case BEQ:return "BEQ";
+			case BNE:return "BNE";
+			case ASS:return "ASS";
+			case JUMP:return "JUMP";
+			case SET:return "SET";
+			case CALL:return "CALL";
+			case RET:return "RETURN";
+			case READ:return "READ";
+			case WRITE:return "WRITE";
+			case LAV:return "LAV";
+			case SAV:return "SAV";
+			default:
+				return "NULL";
+				break;
         }
 }

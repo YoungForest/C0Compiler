@@ -7,7 +7,7 @@
 enum Opcode {
 	// 算术运算符
 	ADD,	// +
-	SUBB,	// -
+	SUB,	// -
 	MUL,	// *
 	DIV,	// /
 	NEG,	// -
@@ -32,6 +32,9 @@ enum Opcode {
 
 	READ,	// 读操作
 	WRITE,	// 写操作
+
+	LAV,	// 取数组中的值 LAV des, array, offset
+	SAV		// 向数组中存值 SAV src, array, offset
 };
 
 class QuaterInstr

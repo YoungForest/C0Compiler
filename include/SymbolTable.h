@@ -11,7 +11,7 @@ struct symbolItem
     int line;   // 声明行数
     int kind;   // 符号的类型, 常量, 变量, 函数, 变量数组, 参数
     int type;   // int or char or void
-    int valoroffset;    // 值, 如果是常量的话/相对基地址偏移, 如果是变量或数组的话
+    int valueoroffset;    // 值, 如果是常量的话/相对基地址偏移, 如果是变量或数组的话
     int length; // 数组长度
 };
 class SymbolTable
@@ -20,13 +20,14 @@ class SymbolTable
         SymbolTable();  // 构造函数
         virtual ~SymbolTable(); // 析构函数
 
-        struct symbolItem searchItem(std::string name);
-        struct symbolItem insertItem(std::string name, int line, int kind, int type, int val = 0, int length = 1);
-        struct symbolItem generateTemp();
+        struct symbolItem *searchItem(std::string name);
+        struct symbolItem *insertItem(std::string name, int line, int kind, int type, int val = 0, int length = 0);
+        struct symbolItem *generateTemp();
+		struct symbolItem* SymbolTable::generateTempConstant(int value);
 
     protected:
     private:
-        std::map<std::string, struct symbolItem> symbolList;
+        std::map<std::string, struct symbolItem*> symbolList;
         int offset;
 };
 
@@ -40,5 +41,6 @@ class SymbolTable
 #define INT_TYPE INT
 #define CHAR_TYPE CHAR
 #define VOID_TYPE VOID
+#define STRING_TYPE 30
 
 #endif // SYMBOLTABLE_H

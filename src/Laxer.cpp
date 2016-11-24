@@ -310,7 +310,7 @@ int Laxer::getsym()
     }
     else if (isMinus()) // -
     {
-        sym = SUB;
+        sym = MINUS;
         getChar();
     }
     else if (isStar())  // *
