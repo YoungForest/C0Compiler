@@ -16,7 +16,7 @@ class Parser
         void parser();
         void functionIn(std::string s);
         void parserTestPrint(std::string s);  // 语法分析程序测试程序, 输出 语法成分
-        void enterTable(SymbolTable *table, string name, int kind, int type, int valueoroffset, int length);  // 登录符号表
+        void enterTable(SymbolTable *table, std::string name, int kind, int type, int valueoroffset, int length);  // 登录符号表
 
         char charactor();   // <字符>    ::=  '<加法运算符>'｜'<乘法运算符>'｜'<字母>'｜'<数字>'
         void program(); // <程序>    ::= ［<常量说明>］［<变量说明>］{<有返回值函数定义>|<无返回值函数定义>}<主函数>

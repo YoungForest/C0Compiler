@@ -7,7 +7,7 @@
 enum Opcode {
 	// 算术运算符
 	ADD,	// +
-	SUB,	// -
+	SUBB,	// -
 	MUL,	// *
 	DIV,	// /
 	NEG,	// -
@@ -28,7 +28,7 @@ enum Opcode {
 	SET,	// 标签设置
 
 	CALL,	// 函数调用
-	RETURN, // 函数返回
+	RET, // 函数返回
 
 	READ,	// 读操作
 	WRITE,	// 写操作
@@ -42,7 +42,7 @@ class QuaterInstr
 
         QuaterInstr(Opcode _op, struct symbolItem* des, struct symbolItem* src1, struct symbolItem* src2);
         void printQuater();
-        string getOpcode();
+        std::string getOpcode();
 
         Opcode op;
         struct symbolItem* des;
