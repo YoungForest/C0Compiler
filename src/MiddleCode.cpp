@@ -13,26 +13,33 @@ MiddleCode::~MiddleCode()
     //dtor
 }
 
-QuaterInstr* MiddleCode::gen(Opcode _op, struct symbolItem* _des = NULL, struct symbolItem* _src1 = NULL, struct symbolItem* _src2 = NULL) {
+QuaterInstr* MiddleCode::gen(Opcode _op, struct symbolItem* _des, struct symbolItem* _src1, struct symbolItem* _src2) {
     QuaterInstr* new_quater_instr = new QuaterInstr(_op, _des, _src1, _src2);
     //add the quater code to the middle code.
     middle_codes.push_back(new_quater_instr);
     return new_quater_instr;
 }
 
+QuaterInstr * MiddleCode::gen(Opcode _op, std::string label, symbolItem * _src1, symbolItem * _src2)
+{
+	QuaterInstr *new_quater_instr = new QuaterInstr(_op, label, _src1, _src2);
+	//add the quater code to the middle code.
+	middle_codes.push_back(new_quater_instr);
+	return new_quater_instr;
+}
+
+void MiddleCode::clear()
+{
+	middle_codes.clear();
+}
+
 void MiddleCode::printMiddleCode()
 {
     vector<QuaterInstr*>::iterator it = middle_codes.begin();
-    while (it != middle_codes.end()) {
+    while (it != middle_codes.end()) 
+	{
         (*it)->printQuater();
         it++;
-        cout << endl;
     }
-}
-
-int MiddleCode::addDataSeg(string _stringconst)
-{
-	int length = data_const_string.size();
-	data_const_string.push_back(_stringconst);
-	return length;
+	cout << endl;
 }

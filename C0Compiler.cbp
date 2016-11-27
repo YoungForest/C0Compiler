@@ -39,12 +39,14 @@
 		<Unit filename="include/Error.h" />
 		<Unit filename="include/Laxer.h" />
 		<Unit filename="include/MiddleCode.h" />
+		<Unit filename="include/MipsInstrGen.h" />
 		<Unit filename="include/Parser.h" />
 		<Unit filename="include/QuaterInstr.h" />
 		<Unit filename="include/SymbolTable.h" />
 		<Unit filename="src/Error.cpp" />
 		<Unit filename="src/Laxer.cpp" />
 		<Unit filename="src/MiddleCode.cpp" />
+		<Unit filename="src/MipsInstrGen.cpp" />
 		<Unit filename="src/Parser.cpp" />
 		<Unit filename="src/QuaterInstr.cpp" />
 		<Unit filename="src/SymbolTable.cpp" />

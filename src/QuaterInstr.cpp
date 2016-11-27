@@ -14,23 +14,32 @@ QuaterInstr::~QuaterInstr()
     //dtor
 }
 
-QuaterInstr::QuaterInstr(Opcode _op, struct symbolItem* _des=NULL, struct symbolItem* _src1=NULL, struct symbolItem* _src2=NULL) {
+QuaterInstr::QuaterInstr(Opcode _op, struct symbolItem* _des, struct symbolItem* _src1, struct symbolItem* _src2) {
     op = _op;
     des = _des;
     src1 = _src1;
     src2 = _src2;
+	label = "";
+}
+
+QuaterInstr::QuaterInstr(Opcode _op, std::string _label, symbolItem * _src1, symbolItem * _src2) : op(_op), src1(_src1), src2(_src2), label(_label)
+{
+	des = NULL;
 }
 
 void QuaterInstr::printQuater()
 {
     stringstream output;
     output << getOpcode();
-    if (des != NULL)
-        output << " " << des->name;
-    if (src1 != NULL)
-        output << " " << src1->name;
-    if (src2 != NULL)
-        output << " " << src2->name;
+	if (!label.empty())
+		output << " " << label;
+	if (des != NULL)
+		output << " " << des->name;
+	if (src1 != NULL)
+		output << " " << src1->name;
+	if (src2 != NULL)
+		output << " " << src2->name;
+
     output << endl;
     cout << output.str(); 
 }
@@ -50,15 +59,21 @@ string QuaterInstr::getOpcode()
 			case BLE:return "BLE";
 			case BEQ:return "BEQ";
 			case BNE:return "BNE";
+			case BNZ: return "BNZ";
+			case BEZ: return "BEZ";
 			case ASS:return "ASS";
 			case JUMP:return "JUMP";
 			case SET:return "SET";
-			case CALL:return "CALL";
+			case CALL: return "CALL";
+			case DEC: return "DEC";
 			case RET:return "RETURN";
 			case READ:return "READ";
 			case WRITE:return "WRITE";
 			case LAV:return "LAV";
 			case SAV:return "SAV";
+			case PUSH: return "PUSH";
+			case PUT: return "PUT";
+			case DSP: return "DSP";
 			default:
 				return "NULL";
 				break;

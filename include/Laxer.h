@@ -36,7 +36,7 @@ class Laxer
         int isRpar();   // 判断ch是否是 右括号
         int isExclamation();    // 判断ch是否是 感叹号
         void catToken();    // 把字符ch追加到 token 末尾
-        void retract();     // 回退一个字符
+        // void retract();     // 回退一个字符
         int reserver();     // 判别保留字
         int transNum();     // 将toekn中的 字符数字 转换为 数字
         int getsym();       // 词法分析程序

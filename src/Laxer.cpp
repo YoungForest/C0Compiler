@@ -209,7 +209,7 @@ int Laxer::reserver()
 // 将toekn中的 一个字符数字 转换为 数字(这里的数字只有一位)
 int Laxer::transNum()
 {
-    return ch - '0';
+    return atoi(token);
 }
 
 // 词法分析程序
@@ -384,9 +384,9 @@ int Laxer::getsym()
         getChar();
         while (ch != '\"')
         {
-            getChar();
             if ((ch <= 126 && ch >= 35) || ch == 32 || ch == 33)
             {
+				catToken();
                 getChar();
             }
         }

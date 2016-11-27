@@ -12,12 +12,12 @@ class MiddleCode
         MiddleCode();
         virtual ~MiddleCode();
         QuaterInstr* gen(Opcode _op, struct symbolItem* _des = NULL, struct symbolItem* _src1 = NULL, struct symbolItem* _src2 = NULL);
-        void printMiddleCode();
-        int addDataSeg(std::string _stringconst);  // 添加常量字符串到data区
-        std::vector<QuaterInstr*>* getMiddleCode();
+		QuaterInstr* gen(Opcode _op, std::string label, struct symbolItem* _src1 = NULL, struct symbolItem* _src2 = NULL);
 
-        std::vector<QuaterInstr *> middle_codes;
-        std::vector<std::string> data_const_string;
+		void clear();	// 清空中间代码缓冲区
+		void printMiddleCode();	// [调试] 输出这段中间代码
+        
+        std::vector<QuaterInstr*> middle_codes;	// 中间代码缓冲
     protected:
     private:
 };

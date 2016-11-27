@@ -3,10 +3,11 @@
 
 using namespace std;
 
-SymbolTable::SymbolTable()
+SymbolTable::SymbolTable(int _scope)
 {
     //ctor
-    offset = 0;
+    offset = 108;
+	scope = _scope;
 }
 
 SymbolTable::~SymbolTable()
@@ -16,13 +17,17 @@ SymbolTable::~SymbolTable()
 
 struct symbolItem* SymbolTable::searchItem(string name)
 {
-    if (symbolList.count(name))
+	for (int i = 0; i < symbolList.size(); i++)
+		if (symbolList[i]->name == name)
+			return symbolList[i];
+    /*if (symbolList.count(name))
         return symbolList[name];
     else
-        return NULL;
+        return NULL;*/
+	return NULL;
 }
 
-struct symbolItem* SymbolTable::insertItem(string name, int line, int kind, int type, int val = 0, int length = 0)
+struct symbolItem* SymbolTable::insertItem(string name, int line, int kind, int type, int val, int length)
 {
 	struct symbolItem* item = new struct symbolItem();
     item->name = name;
@@ -30,9 +35,10 @@ struct symbolItem* SymbolTable::insertItem(string name, int line, int kind, int 
     item->kind = kind;
     item->type = type;
 	item->length = length;
+	item->scope = scope;
     if (item->kind == CONSTANT)
         item->valueoroffset = val;
-    else if (item->kind == VARIABLE)
+    else if (item->kind == VARIABLE || item->kind == PARAMETER)
     {
         int grow;
         if (length == 0)   // no array
@@ -43,7 +49,7 @@ struct symbolItem* SymbolTable::insertItem(string name, int line, int kind, int 
             grow *= 4;  // change 1 to 4 for more easy deal
         else if (item->type == INT_TYPE)
             grow *= 4;
-        item->valueoroffset = offset;
+        item->valueoroffset = - offset;
         offset += grow;
     }
     else if (item->kind == FUNCTION)
@@ -55,7 +61,7 @@ struct symbolItem* SymbolTable::insertItem(string name, int line, int kind, int 
     {
 
     }
-    symbolList.insert(pair<string, struct symbolItem*>(item->name, item));
+    symbolList.push_back(item);
     return item;
 }
 
@@ -63,16 +69,30 @@ struct symbolItem* SymbolTable::generateTemp()
 {
     static int tvc = 0; // temp varieties count
     stringstream name;
-    name << "!temp" << tvc;
+    name << "yangsen_temp" << tvc++;
     struct symbolItem* r = insertItem(name.str(), -1, VARIABLE, INT_TYPE);
     return r;
 }
 
-struct symbolItem* SymbolTable::generateTempConstant(int value)
+int SymbolTable::getPosition(struct symbolItem * elem)
+{
+	for (int i = 0; i < symbolList.size(); i++)
+		if (symbolList[i] == elem)
+			return i;
+	return 0;
+}
+
+void SymbolTable::clear()
+{
+	offset = 108;
+	symbolList.clear();
+}
+
+struct symbolItem* SymbolTable::generateTempConstant(int value, int type)
 {
 	static int tvc = 0; // temp varieties count
 	stringstream name;
-	name << "!tempConstant" << tvc;
-	struct symbolItem* r = insertItem(name.str(), -1, CONSTANT, INT_TYPE, value);
+	name << "yangsen_const" << tvc++;
+	struct symbolItem* r = insertItem(name.str(), -1, CONSTANT, type, value);
 	return r;
 }
