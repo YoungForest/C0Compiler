@@ -5,12 +5,21 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
 Parser::~Parser()
 {
     //dtor
+}
+
+string Parser::to_string(int i)
+{
+	stringstream ss;
+	ss << i;
+	string s = ss.str();
+	return s;
 }
 
 // [调试]
@@ -77,9 +86,11 @@ void Parser::parser(string fileout)
 	// print test segament
 	fo << ".text" << endl;
 	fo << "move $fp, $sp" << endl;
-	fo << "j main" << endl;
+	fo << "j end" << endl;
 	for (int i = 0; i < mipsInstrGen.finalCodes.size(); i++)
 		fo << mipsInstrGen.finalCodes[i].getInstr() << endl;
+	fo << "end:" << endl;
+	fo << "jal main" << endl;
 }
 
 // <程序>    ::= ［<常量说明>］［<变量说明>］{(int|char) <标识符> <有返回值函数定义>| void <无返回值函数定义>} void <主函数>
@@ -358,8 +369,8 @@ int Parser::parameterTable()
 			count++;
 			ident = laxer.getToken();
             laxer.getsym();
-			globalTable.insertItem(ident, laxer.linenum, PARAMETER, type);
-			localTable.insertItem(ident, laxer.linenum, PARAMETER, type);
+			struct symbolItem * para = localTable.insertItem(ident, laxer.linenum, PARAMETER, type);
+			globalTable.insertItem(ident, laxer.linenum, PARAMETER, type, para->valueoroffset);
         }
         while (laxer.sym == COMMA)
         {
@@ -376,8 +387,8 @@ int Parser::parameterTable()
 					ident = laxer.getToken();
 					count++;
                     laxer.getsym();
-					globalTable.insertItem(ident, laxer.linenum, PARAMETER, type);
-					localTable.insertItem(ident, laxer.linenum, PARAMETER, type);
+					struct symbolItem * para = localTable.insertItem(ident, laxer.linenum, PARAMETER, type);
+					globalTable.insertItem(ident, laxer.linenum, PARAMETER, type, para->valueoroffset);
                 }
             }
         }
@@ -392,7 +403,10 @@ void Parser::mainFunction()
     functionIn("mainFunction");
     if (laxer.sym == MAIN)
     {
-		middleCode.gen(Opcode::SET, "main");
+		struct symbolItem *main = new symbolItem();
+		main->name = "main";
+		middleCode.gen(Opcode::DEC, main);
+		//middleCode.gen(Opcode::SET, "main");
         laxer.getsym();
         if (laxer.sym == LPARENT)
         {
@@ -1034,6 +1048,7 @@ struct symbolItem* Parser::expression()
 	{
 		re = localTable.generateTemp();
 		middleCode.gen(Opcode::NEG, re, item1);
+		item1 = re;
 	}
 	else
 		re = item1;

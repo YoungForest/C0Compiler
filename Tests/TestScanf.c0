@@ -1,0 +1,11 @@
+int a;
+char c;
+
+void main()
+{
+    scanf(a);
+    scanf(c);
+    printf("test integer: ", a);
+    printf("test char: ", c);
+    printf("test char + 1: ", c+1);
+}

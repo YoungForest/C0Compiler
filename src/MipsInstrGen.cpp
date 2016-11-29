@@ -1,5 +1,7 @@
 #include "MipsInstrGen.h"
 
+#include <sstream>
+
 using namespace std;
 
 MipsInstrGen::MipsInstrGen()
@@ -12,6 +14,13 @@ MipsInstrGen::~MipsInstrGen()
     //dtor
 }
 
+string MipsInstrGen::to_string(int i)
+{
+	stringstream ss;
+	ss << i;
+	string s = ss.str();
+	return s;
+}
 // ×¨ÃÅÎª set label
 void MipsInstrGen::appendInstruction(string label)
 {
@@ -99,7 +108,7 @@ void MipsInstrGen::dss(QuaterInstr* current, MipsCode _op)
 	string t1 = "$t1";
 	string t2 = "$t2";
 	if (current->src1->kind == CONSTANT && current->src2->kind == CONSTANT)
-		appendInstruction(MipsCode::li, t1, to_string(current->src1->valueoroffset + current->src2->valueoroffset));
+		appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset + current->src2->valueoroffset));
 	else if (current->src1->kind == CONSTANT && current->src2->kind != CONSTANT)
 	{
 		if (current->src2->scope == GLOBAL)
@@ -159,7 +168,7 @@ void MipsInstrGen::generateInstruction(std::vector<QuaterInstr*>& middleCodes)
 			dss(current, MipsCode::mul);
 			break;
 		case DIV:
-			dss(current, MipsCode::div);
+			dss(current, MipsCode::divi);
 			break;
 		case LAV:
 			if (current->src1->scope == GLOBAL && current->src2->kind == CONSTANT)
@@ -416,6 +425,7 @@ void MipsInstrGen::generateInstruction(std::vector<QuaterInstr*>& middleCodes)
 			if (current->des->type == INT_TYPE)
 			{
 				appendInstruction(MipsCode::li, "$v0", "5");
+				appendInstruction(MipsCode::syscall);
 				if (current->des->scope == GLOBAL)
 					appendInstruction(MipsCode::sw, "$v0", current->des->name);
 				else
@@ -424,6 +434,7 @@ void MipsInstrGen::generateInstruction(std::vector<QuaterInstr*>& middleCodes)
 			else
 			{
 				appendInstruction(MipsCode::li, "$v0", "12");
+				appendInstruction(MipsCode::syscall);
 				if (current->des->scope == GLOBAL)
 					appendInstruction(MipsCode::sw, "$v0", current->des->name);
 				else
@@ -431,29 +442,47 @@ void MipsInstrGen::generateInstruction(std::vector<QuaterInstr*>& middleCodes)
 			}
 			break;
 		case WRITE:
-			if (current->des->type == INT_TYPE)
+			if (current->des->kind == CONSTANT)
 			{
-				if (current->des->scope == GLOBAL)
-					appendInstruction(MipsCode::lw, "$a0", current->des->name);
+				if (current->des->type == INT_TYPE)
+				{
+					appendInstruction(MipsCode::li, "$a0", to_string(current->des->valueoroffset));
+					appendInstruction(MipsCode::li, "$v0", "1");
+				}
+				else if (current->des->type == CHAR_TYPE)
+				{
+					appendInstruction(MipsCode::li, "$a0", to_string(current->des->valueoroffset));
+					appendInstruction(MipsCode::li, "$v0", "11");
+				}
+				else if (current->des->type == STRING_TYPE)
+				{
+					appendInstruction(MipsCode::li, "$v0", "4");
+					appendInstruction(MipsCode::la, "$a0", current->des->name);
+				}
 				else
-					appendInstruction(MipsCode::lw, "$a0", to_string(current->des->valueoroffset) +"($fp)");
-				appendInstruction(MipsCode::li, "$v0", "1");
-			}
-			else if (current->des->type == CHAR_TYPE)
-			{
-				if (current->des->scope == GLOBAL)
-					appendInstruction(MipsCode::lw, "$a0", current->des->name);
-				else
-					appendInstruction(MipsCode::lw, "$a0", to_string(current->des->valueoroffset) +"($fp)");
-				appendInstruction(MipsCode::li, "$v0", "11");
-			}
-			else if (current->des->type == STRING_TYPE)
-			{
-				appendInstruction(MipsCode::li, "$v0", "4");
-				appendInstruction(MipsCode::la, "$a0", current->des->name);
+					;
 			}
 			else
-				;
+			{
+				if (current->des->type == INT_TYPE)
+				{
+					if (current->des->scope == GLOBAL)
+						appendInstruction(MipsCode::lw, "$a0", current->des->name);
+					else
+						appendInstruction(MipsCode::lw, "$a0", to_string(current->des->valueoroffset) + "($fp)");
+					appendInstruction(MipsCode::li, "$v0", "1");
+				}
+				else if (current->des->type == CHAR_TYPE)
+				{
+					if (current->des->scope == GLOBAL)
+						appendInstruction(MipsCode::lw, "$a0", current->des->name);
+					else
+						appendInstruction(MipsCode::lw, "$a0", to_string(current->des->valueoroffset) + "($fp)");
+					appendInstruction(MipsCode::li, "$v0", "11");
+				}
+				else
+					;
+			}
 			appendInstruction(MipsCode::syscall);
 			break;
 		case PUSH:

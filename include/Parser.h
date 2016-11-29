@@ -64,6 +64,8 @@ class Parser
 		int addDataSeg(std::string _stringconst);  // 添加常量字符串到data区, 返回常量字符串标号
 		void addDataGlobal(std::string _str);	// 添加全局声明到data区
 
+		std::string to_string(int i);	// 修复code blocks g++ (tdm-1) 4.7.1 bug
+
     protected:
     private:
         SymbolTable globalTable;

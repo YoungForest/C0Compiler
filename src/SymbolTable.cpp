@@ -36,9 +36,9 @@ struct symbolItem* SymbolTable::insertItem(string name, int line, int kind, int 
     item->type = type;
 	item->length = length;
 	item->scope = scope;
-    if (item->kind == CONSTANT)
+    if (item->kind == CONSTANT || (item->kind == PARAMETER && item->scope == GLOBAL))
         item->valueoroffset = val;
-    else if (item->kind == VARIABLE || item->kind == PARAMETER)
+    else if (item->kind == VARIABLE || (item->kind == PARAMETER && item->scope == LOCAL))
     {
         int grow;
         if (length == 0)   // no array

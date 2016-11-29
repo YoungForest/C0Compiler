@@ -16,7 +16,7 @@ enum MipsCode
 	sub,
 	subi,
 	mul,
-	div,
+	divi,
 	neg,
 	jal,
 	j,
@@ -119,7 +119,7 @@ public:
 			return "subi";
 		case mul:
 			return "mul";
-		case MipsCode::div:
+		case MipsCode::divi:
 			return "div";
 		case neg:
 			return "neg";
@@ -163,8 +163,9 @@ class MipsInstrGen
 		void appendInstruction(std::string label);
 		void appendInstruction(MipsCode _op, std::string _des = "", std::string _src1 = "", std::string _src2 = "");
 		void generateInstruction(std::vector<QuaterInstr*>& middleCodes);
-		void MipsInstrGen::dss(QuaterInstr* current, MipsCode _op);	// dss 型四元式
-		void MipsInstrGen::lss(QuaterInstr* current, MipsCode _op);	// lss 型四元式
+		void dss(QuaterInstr* current, MipsCode _op);	// dss 型四元式
+		void lss(QuaterInstr* current, MipsCode _op);	// lss 型四元式
+		std::string to_string(int i);	// 修复code blocks g++ (tdm-1) 4.7.1 bug
 
 
 		std::vector<Instruction> finalCodes;	// 目标代码缓冲区

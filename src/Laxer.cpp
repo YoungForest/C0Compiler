@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <stdlib.h>
 
 #include "Laxer.h"
 #include "Error.h"

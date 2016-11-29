@@ -8,6 +8,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+	freopen("C:/Users/young/Desktop/middleCode.mc", "w", stdout);
 	if (argc != 3)
 	{
 		printf("Too few or many arguments.\n");
@@ -26,7 +27,7 @@ int main(int argc, char *argv[])
 	Parser *parser0 = new Parser(filein);
     parser0->parser(fileout);
 
-	system("pause");
+	//system("pause");
 
 	return 0;
 }

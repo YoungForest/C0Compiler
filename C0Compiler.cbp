@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="14061213_test.txt" />
+				<Option parameters="in.c0 out.asm" />
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
