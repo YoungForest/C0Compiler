@@ -33,6 +33,27 @@ int fibonacci(int n)
         return (0);
 }
 
+void func()
+{
+    int ch, j, k, i;
+    i = 100;
+    j = 40;
+    k = 20;
+    printf(i*(- func_2_number(j, 20) + k) * (j / k));
+    putchar('_');
+    ch = '/';
+    if( ch + 10 < MAX)
+        if( ch + 10 != MIN)
+            if (ch - 5 > MIN)
+                if (ch - 4 >= MIN)
+                    if (ch + 15 <= MAX)
+                        if(ch + 10 != gap)
+                            if (ch)
+                                if (ch == 47)
+                                    if (ch == '/')
+                                        printf(ch - 10);
+}
+
 void main()
 {
     const int top = 12; 
@@ -45,6 +66,7 @@ void main()
         putchar(_abcdefghigklmnopqrstuvwxyz[i]);
         printf(i);
     }
+    putchar('_');
     _abcdefghigklmnopqrstuvwxyz[1] = 'B'
     _abcdefghigklmnopqrstuvwxyz[2] = 'C'
     _abcdefghigklmnopqrstuvwxyz[3] = 'D'
@@ -80,25 +102,33 @@ void main()
     _abcdefghigklmnopqrstuvwxyz[33] = '7'
     _abcdefghigklmnopqrstuvwxyz[34] = '8'
     _abcdefghigklmnopqrstuvwxyz[35] = '9'
+    for(i = 26; i <= 35; i=i+1)
+    {
+        putchar(_abcdefghigklmnopqrstuvwxyz[i]);
+        printf(i);
+    }
 
     {}
     f = 0;
-    k = 10;
     do
     {
         f = f + 5;
         printf("The number of 'f*10' is:", f * 10);
+        putchar('_');
     }
     while(f < top)
 
+    scanf(i, j, k, ch);
     printf("The first number you input is ");
     printf(i);
     if(i)
     {
-        printf("Its fibonacci is");
+        printf("Its fibonacci is ");
         printf(fibonacci(i));
+        putchar('_')
     }
-    printf(i*(- func_2_number(j, 20) + k) * (j / k));
-   
+    
+    func();
+
     return ;
 }

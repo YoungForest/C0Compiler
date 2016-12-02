@@ -427,6 +427,7 @@ void Parser::mainFunction()
             }
         }
     }
+	middleCode.gen(Opcode::RET);
 	mipsInstrGen.generateInstruction(middleCode.middle_codes);
 	middleCode.printMiddleCode();
 	middleCode.clear();
