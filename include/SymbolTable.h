@@ -23,6 +23,7 @@ class SymbolTable
 		struct symbolItem* searchItem(std::string ident);
         struct symbolItem* insertItem(std::string name, int line, int kind, int type, int val = 0, int length = 0);
         struct symbolItem* generateTemp();	// 生成临时变量
+		struct symbolItem* generateTempChar();	// 生成临时字符类型变量
 		struct symbolItem* generateTempConstant(int value, int type);	// 生成临时常量
 		int getPosition(struct symbolItem* elem);	// 获取元素的下标, 为找到函数的参数
 		void clear();	// 清空符号表

@@ -8,7 +8,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	freopen("C:/Users/young/Desktop/middleCode.mc", "w", stdout);
+//	freopen("middleCode.mc", "w", stdout);
 	if (argc != 3)
 	{
 		printf("Too few or many arguments.\n");

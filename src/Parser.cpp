@@ -881,7 +881,10 @@ struct symbolItem* Parser::callFunction(string ident)
 			middleCode.gen(Opcode::CALL, func->name);
 			if (func->type != VOID_TYPE)
 			{
-				re = localTable.generateTemp();
+				if (func->type == INT_TYPE)
+					re = localTable.generateTemp();
+				else
+					re = localTable.generateTempChar();
 				middleCode.gen(Opcode::PUT, re);
 			}
         }

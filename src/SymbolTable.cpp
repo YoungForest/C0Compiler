@@ -74,6 +74,15 @@ struct symbolItem* SymbolTable::generateTemp()
     return r;
 }
 
+struct symbolItem* SymbolTable::generateTempChar()
+{
+	static int tvc = 0; // temp varieties count
+	stringstream name;
+	name << "yangsen_tempchar" << tvc++;
+	struct symbolItem* r = insertItem(name.str(), -1, VARIABLE, CHAR_TYPE);
+	return r;
+}
+
 int SymbolTable::getPosition(struct symbolItem * elem)
 {
 	for (int i = 0; i < symbolList.size(); i++)

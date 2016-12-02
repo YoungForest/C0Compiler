@@ -6,3 +6,10 @@ obj/
 
 # input/output file
 *.txt
+*.c0
+
+# middle code
+*.mc
+
+# final codes files
+*.asm
