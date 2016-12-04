@@ -1,3 +1,4 @@
+# generate time: Mon Dec 05 02:32:16 2016
 .data
 array: .space 400
 i: .word 0
@@ -739,6 +740,36 @@ j ifend11
 elsebegin11:   
 ifend11:   
 jal func  
+li $v0 0 
+lw $v1 -8($fp) 
+lw $a0 -12($fp) 
+lw $a1 -16($fp) 
+lw $a2 -20($fp) 
+lw $a3 -24($fp) 
+lw $t0 -28($fp) 
+lw $t1 -32($fp) 
+lw $t2 -36($fp) 
+lw $t3 -40($fp) 
+lw $t4 -44($fp) 
+lw $t5 -48($fp) 
+lw $t6 -52($fp) 
+lw $t7 -56($fp) 
+lw $s0 -60($fp) 
+lw $s1 -64($fp) 
+lw $s2 -68($fp) 
+lw $s3 -72($fp) 
+lw $s4 -76($fp) 
+lw $s5 -80($fp) 
+lw $s6 -84($fp) 
+lw $s7 -88($fp) 
+lw $t8 -92($fp) 
+lw $t9 -96($fp) 
+lw $k0 -100($fp) 
+lw $k1 -104($fp) 
+lw $ra 0($fp) 
+move $sp $fp 
+lw $fp -4($fp) 
+jr $ra  
 li $v0 0 
 lw $v1 -8($fp) 
 lw $a0 -12($fp) 

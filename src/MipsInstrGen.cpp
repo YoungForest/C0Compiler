@@ -181,6 +181,7 @@ void MipsInstrGen::generateInstruction(std::vector<QuaterInstr*>& middleCodes)
 					appendInstruction(MipsCode::lw, t1, current->src2->name);
 				else
 					appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) +"($fp)");
+				appendInstruction(MipsCode::mul, t1, t1, "4");
 				appendInstruction(MipsCode::lw, t0, current->src1->name + "(" + t1 + ")");
 			}
 			else
@@ -220,6 +221,7 @@ void MipsInstrGen::generateInstruction(std::vector<QuaterInstr*>& middleCodes)
 						appendInstruction(MipsCode::lw, t1, current->src2->name);
 					else
 						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) +"($fp)");
+					appendInstruction(MipsCode::mul, t1, t1, "4");
 					appendInstruction(MipsCode::sw, t0, current->src1->name + "(" + t1 + ")");
 				}
 			}

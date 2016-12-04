@@ -6,6 +6,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <ctime>
+#include <chrono>
 
 using namespace std;
 
@@ -22,6 +24,28 @@ string Parser::to_string(int i)
 	return s;
 }
 
+// [错误处理]
+void Parser::errorGenerate(int errortype)
+{
+	error_handler.errorMessage(errortype, laxer.lastlinenum, laxer.lastcc);
+}
+
+// [错误处理]
+void Parser::errorGenerate(int errortype, std::string message1)
+{
+	error_handler.errorMessage(errortype, laxer.lastlinenum, laxer.lastcc, message1);
+}
+
+void Parser::errorGenerate(int errortype, std::string message1, std::string message2)
+{
+	error_handler.errorMessage(errortype, laxer.lastlinenum, laxer.lastcc, message1, message2);
+}
+
+void Parser::warningGenerate(int warningtype, std::string message1)
+{
+	error_handler.warningMessage(warningtype, laxer.lastlinenum, laxer.lastcc, message1);
+}
+
 // [调试]
 void Parser::parserTestPrint(string s)
 {
@@ -34,7 +58,7 @@ void Parser::functionIn(string s)
      //cout << "Function in " << s << endl;
 }
 
-// 根据变量名, 查找符号表, 如果为找到报错 
+// 根据变量名, 查找符号表, 如果未找到报错 
 struct symbolItem* Parser::test(string ident)
 {
 	SymbolTable* st;
@@ -50,13 +74,18 @@ struct symbolItem* Parser::test(string ident)
 		re = st->searchItem(ident);
 		if (re == NULL)
 		{
-			error_handler.errorMessage(2, laxer.linenum, laxer.cc);
-#ifdef DEBUG
-			throw ident;
-#endif
+			errorGenerate(103, ident);
 		}
 	}
     return re;
+}
+
+// 根据变量名, 查找符号表, 如果找到报错(重复定义)
+void Parser::test2(string ident, SymbolTable *st)
+{
+	struct symbolItem* re = st->searchItem(ident);
+	if (re != NULL)
+		errorGenerate(200, ident, to_string(re->line));
 }
 
 
@@ -64,33 +93,51 @@ void Parser::parser(string fileout)
 {
     laxer.getsym();
     program();	// 进入语法分析程序入口, 同时语义分析, 生成中间代码, 生成目标代码
-	// 将全局变量输出到.data缓冲数组中
-	vector<struct symbolItem*>::iterator it = globalTable.symbolList.begin();
-	while (it != globalTable.symbolList.end())
+	if (error_handler.warning_count > 0)
 	{
-		if ((*it)->kind == VARIABLE && (*it)->length == 0)
-			addDataGlobal((*it)->name + ": .word 0");
-		else if ((*it)->kind == VARIABLE && (*it)->length > 0)
-			addDataGlobal((*it)->name + ": .space " + to_string(4 * ((*it)->length)));
-		else
-			;
-		it++;
+		error_handler.printWarnings();
+		cout << endl << "Warnings count: " << error_handler.warning_count << endl;
 	}
-	fstream fo(fileout, ios::out);
-	// print data segament
-	fo << ".data" << endl;
-	for (int i = 0; i < data_global_v.size(); i++)
-		fo << data_global_v[i] << endl;
-	for (int i = 0; i < data_const_string.size(); i++)
-		fo << "yangsen_string" << i << ": .asciiz \"" << data_const_string[i] << "\"" << endl;
-	// print test segament
-	fo << ".text" << endl;
-	fo << "move $fp, $sp" << endl;
-	fo << "j end" << endl;
-	for (int i = 0; i < mipsInstrGen.finalCodes.size(); i++)
-		fo << mipsInstrGen.finalCodes[i].getInstr() << endl;
-	fo << "end:" << endl;
-	fo << "jal main" << endl;
+	if (!error_handler.isSuccess())
+	{
+		error_handler.printErrors();
+		cout << endl << "Compiled error! exit code -1. error count: " << error_handler.getErrorCount() << endl;
+	}
+	else
+	{
+		// 将全局变量输出到.data缓冲数组中
+		vector<struct symbolItem*>::iterator it = globalTable.symbolList.begin();
+		while (it != globalTable.symbolList.end())
+		{
+			if ((*it)->kind == VARIABLE && (*it)->length == 0)
+				addDataGlobal((*it)->name + ": .word 0");
+			else if ((*it)->kind == VARIABLE && (*it)->length > 0)
+				addDataGlobal((*it)->name + ": .space " + to_string(4 * ((*it)->length)));
+			else
+				;
+			it++;
+		}
+		fstream fo(fileout, ios::out);
+		// print date and time
+		std::chrono::time_point<std::chrono::system_clock> start;
+		start = std::chrono::system_clock::now();
+		std::time_t start_time = std::chrono::system_clock::to_time_t(start);
+		fo << "# generate time: " << std::ctime(&start_time);
+		// print data segament
+		fo << ".data" << endl;
+		for (int i = 0; i < data_global_v.size(); i++)
+			fo << data_global_v[i] << endl;
+		for (int i = 0; i < data_const_string.size(); i++)
+			fo << "yangsen_string" << i << ": .asciiz \"" << data_const_string[i] << "\"" << endl;
+		// print test segament
+		fo << ".text" << endl;
+		fo << "move $fp, $sp" << endl;
+		fo << "j end" << endl;
+		for (int i = 0; i < mipsInstrGen.finalCodes.size(); i++)
+			fo << mipsInstrGen.finalCodes[i].getInstr() << endl;
+		fo << "end:" << endl;
+		fo << "jal main" << endl;
+	}
 }
 
 // <程序>    ::= ［<常量说明>］［<变量说明>］{(int|char) <标识符> <有返回值函数定义>| void <无返回值函数定义>} void <主函数>
@@ -118,9 +165,13 @@ void Parser::program()
             }
             else
             {
-
+				errorGenerate(6);
             }
         }
+		else
+		{
+			errorGenerate(4);
+		}
     }
     while (laxer.sym == INT || laxer.sym == CHAR || laxer.sym == VOID)
     {
@@ -139,14 +190,7 @@ void Parser::program()
             }
             else
             {
-                int type = laxer.sym;
-                laxer.getsym();
-                if (laxer.sym == IDENTIFIER)
-                {
-                    string ident = laxer.getToken();
-                    laxer.getsym();
-                    defineReturnFunction(type, ident);
-                }
+				errorGenerate(8);
             }
         }
         else
@@ -159,6 +203,10 @@ void Parser::program()
                 laxer.getsym();
                 defineReturnFunction(type, ident);
             }
+			else
+			{
+				errorGenerate(10);
+			}
         }
     }
 }
@@ -179,6 +227,7 @@ void Parser::defineVoidFunction()
             length = parameterTable();
             if (laxer.sym == RPARENT)
             {
+				test2(ident, &globalTable);
 				globalTable.insertItem(ident, laxer.linenum, FUNCTION, VOID_TYPE, 0, length);
 				struct symbolItem* f = test(ident);
 				middleCode.gen(Opcode::DEC, f);
@@ -193,9 +242,25 @@ void Parser::defineVoidFunction()
                         laxer.getsym();
                         parserTestPrint("void function define");
                     }
+					else
+					{
+						errorGenerate(18);
+					}
                 }
+				else
+				{
+					errorGenerate(16);
+				}
             }
+			else
+			{
+				errorGenerate(14);
+			}
         }
+		else
+		{
+			errorGenerate(12);
+		}
     }
 	mipsInstrGen.generateInstruction(middleCode.middle_codes);
 	middleCode.printMiddleCode();
@@ -213,6 +278,7 @@ void Parser::defineReturnFunction(int type, string ident)
     {
         laxer.getsym();
         length = parameterTable();
+		test2(ident, &globalTable);
 		globalTable.insertItem(ident, laxer.linenum, FUNCTION, type, 0, length);
 		struct symbolItem* f = test(ident);
 		middleCode.gen(Opcode::DEC, f);
@@ -228,9 +294,25 @@ void Parser::defineReturnFunction(int type, string ident)
                     laxer.getsym();
                     parserTestPrint("return function define");
                 }
+				else
+				{
+					errorGenerate(18);
+				}
             }
+			else
+			{
+				errorGenerate(16);
+			}
         }
+		else
+		{
+			errorGenerate(14);
+		}
     }
+	else
+	{
+		errorGenerate(12);
+	}
 	middleCode.gen(Opcode::RET);
 	mipsInstrGen.generateInstruction(middleCode.middle_codes);
 	middleCode.printMiddleCode();
@@ -271,23 +353,39 @@ void Parser::varietyDenote(SymbolTable &table)
             if (laxer.sym == IDENTIFIER)
             {
 				ident = laxer.getToken();
+				test2(ident, &table);
                 laxer.getsym();
                 if (laxer.sym == LSQUARE)
                 {
                     laxer.getsym();
 					if (laxer.sym == UNSIGNED_INGEGER)
+					{
 						table.insertItem(ident, laxer.linenum, VARIABLE, type, 0, laxer.num);
-					laxer.getsym();
+						laxer.getsym();
+					}
+					else
+					{
+						table.insertItem(ident, laxer.linenum, VARIABLE, type, 0, 20);	// 容错处理, 设数组长度为20
+						errorGenerate(22);
+					}
                     if (laxer.sym == RSQUARE)
                     {
                         laxer.getsym();
                     }
+					else
+					{
+						errorGenerate(24);
+					}
                 }
 				else
 				{
 					table.insertItem(ident, laxer.linenum, VARIABLE, type);
 				}
             }
+			else
+			{
+				errorGenerate(20);
+			}
         }
         while (laxer.sym == COMMA);
         if (laxer.sym == SEMICOLON)
@@ -295,6 +393,10 @@ void Parser::varietyDenote(SymbolTable &table)
             laxer.getsym();
             parserTestPrint("variety define");
         }
+		else
+		{
+			errorGenerate(26);
+		}
     }
     parserTestPrint("variety denote");
 }
@@ -303,16 +405,28 @@ void Parser::varietyDenote(SymbolTable &table)
 void Parser::varietyDenote(SymbolTable &table, int type, string ident)
 {
     functionIn("varietyDenote");
+	test2(ident, &table);
     if (laxer.sym == LSQUARE)
     {
         laxer.getsym();
 		if (laxer.sym == UNSIGNED_INGEGER)
+		{
 			table.insertItem(ident, laxer.linenum, VARIABLE, type, 0, laxer.num);
-		laxer.getsym();
+			laxer.getsym();
+		}
+		else
+		{
+			table.insertItem(ident, laxer.linenum, VARIABLE, type, 0, 20);	// 容错处理, 设数组长度为20
+			errorGenerate(22);
+		}
         if (laxer.sym == RSQUARE)
         {
             laxer.getsym();
         }
+		else
+		{
+			errorGenerate(24);
+		}
     }
 	else
 	{
@@ -325,29 +439,50 @@ void Parser::varietyDenote(SymbolTable &table, int type, string ident)
         if (laxer.sym == IDENTIFIER)
         {
 			ident2 = laxer.getToken();
+			test2(ident2, &table);
             laxer.getsym();
             if (laxer.sym == LSQUARE)
             {
                 laxer.getsym();
 				if (laxer.sym == UNSIGNED_INGEGER)
+				{
 					table.insertItem(ident2, laxer.linenum, VARIABLE, type, 0, laxer.num);
-				laxer.getsym();
-                if (laxer.sym == RSQUARE)
+					laxer.getsym();
+				}
+				else
+				{
+					table.insertItem(ident2, laxer.linenum, VARIABLE, type, 0, 20);	// 容错处理, 设数组长度为20
+					errorGenerate(22);
+				}
+				if (laxer.sym == RSQUARE)
                 {
                     laxer.getsym();
                 }
+				else
+				{
+					errorGenerate(24);
+				}
             }
 			else
 			{
 				table.insertItem(ident2, laxer.linenum, VARIABLE, type);
 			}
         }
+		else
+		{
+			errorGenerate(20);
+		}
+
     }
     if (laxer.sym == SEMICOLON)
     {
         laxer.getsym();
         parserTestPrint("global variety define");
     }
+	else
+	{
+		errorGenerate(26);
+	}
 }
 
 // [返回值] 参数数量
@@ -372,6 +507,10 @@ int Parser::parameterTable()
 			struct symbolItem * para = localTable.insertItem(ident, laxer.linenum, PARAMETER, type);
 			globalTable.insertItem(ident, laxer.linenum, PARAMETER, type, para->valueoroffset);
         }
+		else
+		{
+			errorGenerate(20);
+		}
         while (laxer.sym == COMMA)
         {
             laxer.getsym();
@@ -390,7 +529,15 @@ int Parser::parameterTable()
 					struct symbolItem * para = localTable.insertItem(ident, laxer.linenum, PARAMETER, type);
 					globalTable.insertItem(ident, laxer.linenum, PARAMETER, type, para->valueoroffset);
                 }
+				else
+				{
+					errorGenerate(20);
+				}
             }
+			else
+			{
+				errorGenerate(28);
+			}
         }
     }
 	return count;
@@ -423,9 +570,25 @@ void Parser::mainFunction()
                         parserTestPrint("main function");
                         laxer.getsym();
                     }
+					else
+					{
+						errorGenerate(18);
+					}
                 }
+				else
+				{
+					errorGenerate(16);
+				}
             }
+			else
+			{
+				errorGenerate(14);
+			}
         }
+		else
+		{
+			errorGenerate(12);
+		}
     }
 	middleCode.gen(Opcode::RET);
 	mipsInstrGen.generateInstruction(middleCode.middle_codes);
@@ -448,6 +611,10 @@ void Parser::constantDenote(SymbolTable &table)
             {
                 laxer.getsym();
             }
+			else
+			{
+				errorGenerate(26);
+			}
         }
         while (laxer.sym == CONST);
         parserTestPrint("constant denote");
@@ -470,6 +637,7 @@ void Parser::constantDefine(SymbolTable &table)
             if (laxer.sym == IDENTIFIER)
             {
                 name = laxer.getToken();
+				test2(name, &table);
                 laxer.getsym();
                 if (laxer.sym == BECOMES)
                 {
@@ -477,7 +645,15 @@ void Parser::constantDefine(SymbolTable &table)
                     value = integer();
 					table.insertItem(name, laxer.linenum, kind, type, value);
                 }
+				else
+				{
+					errorGenerate(30);
+				}
             }
+			else
+			{
+				errorGenerate(20);
+			}
         }
         while (laxer.sym == COMMA);
         parserTestPrint("int constant define");
@@ -501,12 +677,28 @@ void Parser::constantDefine(SymbolTable &table)
                         laxer.getsym();
 						table.insertItem(name, laxer.linenum, kind, type, value);
                     }
+					else
+					{
+						errorGenerate(32);
+					}
                 }
+				else
+				{
+					errorGenerate(30);
+				}
             }
+			else
+			{
+				errorGenerate(20);
+			}
         }
         while (laxer.sym == COMMA);
         parserTestPrint("char constant define");
     }
+	else
+	{
+		errorGenerate(28);
+	}
 }
 
 // <整数> ::= ［+｜-］<无符号整数>｜０
@@ -515,32 +707,45 @@ int Parser::integer()
     functionIn("integer");
 	int re;
 	bool minus = false;
-	if (laxer.sym == PLUS)
-    {
-        laxer.getsym();
-    }
-    else if (laxer.sym == MINUS)
-    {
-        laxer.getsym();
-		minus = true;
-    }
-    else
-        ;
-    if(laxer.sym == ZERO_NUMBER)
-    {
-        laxer.getsym();
-        parserTestPrint("integer");
-        return 0;
-    }
-    else if (laxer.sym == UNSIGNED_INGEGER)
-    {
-		re = laxer.num;
-        laxer.getsym();
-        parserTestPrint("integer");
-        return laxer.num;
-    }
-    else
-        return 0;
+	if (laxer.sym == ZERO_NUMBER)
+	{
+		laxer.getsym();
+		parserTestPrint("integer");
+		return 0;
+	}
+	else if (laxer.sym == PLUS || laxer.sym == MINUS || laxer.sym == UNSIGNED_INGEGER)
+	{
+		if (laxer.sym == PLUS)
+		{
+			laxer.getsym();
+		}
+		else if (laxer.sym == MINUS)
+		{
+			laxer.getsym();
+			minus = true;
+		}
+		else
+			;
+
+		if (laxer.sym == UNSIGNED_INGEGER)
+		{
+			re = laxer.num;
+			if (minus)
+				re = -re;
+			laxer.getsym();
+			parserTestPrint("integer");
+			
+			return re;
+		}
+		else
+		{
+			errorGenerate(22);
+		}
+	}
+	else
+	{
+		errorGenerate(34);
+	}
 }
 
 // <语句>    ::= <条件语句>｜<do循环语句> | <for循环语句>｜‘{’<语句列>‘}’｜<函数调用语句>;｜<赋值语句>;｜<读语句>;｜<写语句>;｜<空>;｜<返回语句>;
@@ -567,6 +772,10 @@ void Parser::statement()
         {
             laxer.getsym();
         }
+		else
+		{
+			errorGenerate(18);
+		}
     }
     else if (laxer.sym == SCANF)
     {
@@ -575,6 +784,10 @@ void Parser::statement()
         {
             laxer.getsym();
         }
+		else
+		{
+			errorGenerate(26);
+		}
     }
     else if (laxer.sym == PRINTF)
     {
@@ -583,6 +796,10 @@ void Parser::statement()
         {
             laxer.getsym();
         }
+		else
+		{
+			errorGenerate(26);
+		}
     }
     else if (laxer.sym == SEMICOLON)
     {
@@ -595,6 +812,10 @@ void Parser::statement()
         {
             laxer.getsym();
         }
+		else
+		{
+			errorGenerate(26);
+		}
     }
     else if (laxer.sym == IDENTIFIER)
     {
@@ -618,12 +839,12 @@ void Parser::statement()
         }
         else
         {
-
+			errorGenerate(38);
         }
     }
     else
     {
-
+		errorGenerate(36);
     }
     parserTestPrint("statement");
 }
@@ -675,7 +896,7 @@ void Parser::branchStatement()
 				case GEQ: middleCode.gen(Opcode::BLT, "elsebegin" + to_string(count), cmpl, cmpr); break;
 				case NEQ: middleCode.gen(Opcode::BEQ, "elsebegin" + to_string(count), cmpl, cmpr); break;
 				case EQL: middleCode.gen(Opcode::BNE, "elsebegin" + to_string(count), cmpl, cmpr); break;
-				default:	// error
+				default:	errorGenerate(42); // error
 					break;
 				}
                 laxer.getsym();
@@ -689,9 +910,21 @@ void Parser::branchStatement()
                 }
 				middleCode.gen(Opcode::SET, "ifend" + to_string(count));
             }
+			else
+			{
+				errorGenerate(14);
+			}
         }
+		else
+		{
+			errorGenerate(12);
+		}
         parserTestPrint("branch statement");
     }
+	else
+	{
+		errorGenerate(40);
+	}
 }
 
 // do <语句> while '(' <条件> ')'
@@ -725,17 +958,33 @@ void Parser::doCycleStatement()
 				case GEQ: middleCode.gen(Opcode::BGE, "dobegin" + to_string(count), cmpl, cmpr); break;
 				case NEQ: middleCode.gen(Opcode::BNE, "dobegin" + to_string(count), cmpl, cmpr); break;
 				case EQL: middleCode.gen(Opcode::BEQ, "dobegin" + to_string(count), cmpl, cmpr); break;
-				default:	// error
+				default: errorGenerate(42);	// error
 					break;
 				}
 				if (laxer.sym == RPARENT)
                 {
                     laxer.getsym();
                 }
+				else
+				{
+					errorGenerate(14);
+				}
             }
+			else
+			{
+				errorGenerate(12);
+			}
         }
+		else
+		{
+			errorGenerate(46);
+		}
         parserTestPrint("do cycle statement");
     }
+	else
+	{
+		errorGenerate(44);
+	}
 	count++;
 }
 
@@ -815,22 +1064,70 @@ void Parser::forCycleStatement()
 													case GEQ: middleCode.gen(Opcode::BGE, "forbegin" + to_string(count), cmpl, cmpr); break;
 													case NEQ: middleCode.gen(Opcode::BNE, "forbegin" + to_string(count), cmpl, cmpr); break;
 													case EQL: middleCode.gen(Opcode::BEQ, "forbegin" + to_string(count), cmpl, cmpr); break;
-													default:	// error
+													default: errorGenerate(42);	// error
 														break;
 													}
                                                 }
+												else
+												{
+													errorGenerate(14);
+												}
                                             }
+											else
+											{
+												errorGenerate(22);
+											}
                                         }
+										else
+										{
+											errorGenerate(50);
+										}
                                     }
+									else
+									{
+										errorGenerate(20);
+									}
                                 }
+								else
+								{
+									errorGenerate(30);
+								}
                             }
+							else
+							{
+								errorGenerate(20);
+							}
                         }
+						else
+						{
+							errorGenerate(26);
+						}
                     }
+					else
+					{
+						errorGenerate(26);
+					}
                 }
+				else
+				{
+					errorGenerate(30);
+				}
             }
+			else
+			{
+				errorGenerate(20);
+			}
         }
+		else
+		{
+			errorGenerate(12);
+		}
         parserTestPrint("for cycle statement");
     }
+	else
+	{
+		errorGenerate(48);
+	}
 	count++;
 }
 
@@ -857,11 +1154,19 @@ void Parser::assignStatement(string ident)
                 struct symbolItem* src = expression();
 				middleCode.gen(Opcode::SAV, src, des, index);
             }
+			else
+			{
+				errorGenerate(30);
+			}
         }
+		else
+		{
+			errorGenerate(24);
+		}
     }
     else
     {
-
+		errorGenerate(52);
     }
     parserTestPrint("assign statement");
 }
@@ -889,7 +1194,15 @@ struct symbolItem* Parser::callFunction(string ident)
 				middleCode.gen(Opcode::PUT, re);
 			}
         }
+		else
+		{
+			errorGenerate(14);
+		}
     }
+	else
+	{
+		errorGenerate(12);
+	}
     parserTestPrint("function call");
 	return re;
 }
@@ -912,12 +1225,19 @@ void Parser::valueParameterTable(struct symbolItem* func)
         while (laxer.sym == COMMA)
         {
 			if (count <= 0)
-				;	//error
+			{
+				errorGenerate(104, to_string(func->length));	//error
+				break;
+			}
             laxer.getsym();
             re = expression();
 			index = globalTable.symbolList[base - (count--)];
 			middleCode.gen(Opcode::PUSH, re, index);
         }
+		if (count > 0)
+		{
+			errorGenerate(106, to_string(func->length));
+		}
     }
     parserTestPrint("value parameter table");
 }
@@ -960,15 +1280,35 @@ void Parser::read()
 						middleCode.gen(Opcode::READ, re);
                         laxer.getsym();
                     }
+					else
+					{
+						errorGenerate(20);
+					}
                 }
                 if (laxer.sym == RPARENT)
                 {
                     laxer.getsym();
                 }
+				else
+				{
+					errorGenerate(14);
+				}
             }
+			else
+			{
+				errorGenerate(20);
+			}
             parserTestPrint("read statement");
         }
+		else
+		{
+			errorGenerate(12);
+		}
     }
+	else
+	{
+		errorGenerate(54);
+	}
 }
 
 // <写语句>    ::=  printf‘(’<字符串>,<表达式>‘)’|printf ‘(’<字符串>‘)’|printf ‘(’<表达式>‘)’
@@ -996,6 +1336,10 @@ void Parser::write()
                 {
                     laxer.getsym();
                 }
+				else
+				{
+					errorGenerate(14);
+				}
             }
             else
             {
@@ -1004,10 +1348,22 @@ void Parser::write()
                 {
                     laxer.getsym();
                 }
+				else
+				{
+					errorGenerate(14);
+				}
             }
         }
+		else
+		{
+			errorGenerate(14);
+		}
         parserTestPrint("write statement");
     }
+	else
+	{
+		errorGenerate(56);
+	}
 }
 
 // <返回语句>   ::=  return[‘(’<表达式>‘)’]
@@ -1026,6 +1382,10 @@ void Parser::returnStatement()
 				laxer.getsym();
 				middleCode.gen(Opcode::RET, returnValue);
 			}
+			else
+			{
+				errorGenerate(14);
+			}
         }
 		else
 		{
@@ -1033,6 +1393,10 @@ void Parser::returnStatement()
 		}
         parserTestPrint("return statement");
     }
+	else
+	{
+		errorGenerate(58);
+	}
 }
 
 // <表达式>    ::= ［＋｜－］<项>{<加法运算符><项>}
@@ -1098,9 +1462,24 @@ struct symbolItem* Parser::factor()
 				return re;
 			}
 		}
-		else if (laxer.sym == LPARENT && f->kind == FUNCTION && (f->type == CHAR_TYPE || f->type == INT_TYPE))
+		else if (laxer.sym == LPARENT)
 		{
-			return callFunction(ident);
+			if (f->kind == FUNCTION)
+			{
+				if (f->type == CHAR_TYPE || f->type == INT_TYPE)
+				{
+					return callFunction(ident);
+				}
+				else
+				{
+					errorGenerate(108, f->name);
+					return NULL;
+				}
+			}
+			else
+			{
+				errorGenerate(110, f->name);
+			}
 		}
 		else
 		{
@@ -1131,6 +1510,7 @@ struct symbolItem* Parser::factor()
 	}
 	else
 	{
+		errorGenerate(60);
 		return NULL;
 	}
 	parserTestPrint("factor");

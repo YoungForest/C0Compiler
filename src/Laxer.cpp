@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <sstream>
 #include <stdlib.h>
-
+#include <climits>
 #include "Laxer.h"
 #include "Error.h"
 
@@ -26,6 +26,8 @@ Laxer::Laxer(string filename, Error& _error_handle) :error_handle(_error_handle)
     ch = ' ';
     linenum = 1;
     getChar();
+	lastcc = 0;
+	lastlinenum = 1;
 };
 
 Laxer::~Laxer()
@@ -210,12 +212,23 @@ int Laxer::reserver()
 // 将toekn中的 一个字符数字 转换为 数字(这里的数字只有一位)
 int Laxer::transNum()
 {
-    return atoi(token);
+	long long re = atoll(token);
+	if (strlen(token) > 10)
+		error_handle.warningMessage(304, linenum, cc, getToken());
+	else if (re > INT_MAX)	// 词法分析不分析负数
+		error_handle.warningMessage(302, linenum, cc, getToken());
+	else
+		;
+
+	return (int) re;
 }
 
 // 词法分析程序
 int Laxer::getsym()
 {
+	// [Error] 记录上次调用词法分析程序的位置
+	lastcc = cc;
+	lastlinenum = linenum;
     // 清除 字符缓冲区
     clearToken();
     // 跳过所有 空白符
@@ -301,7 +314,8 @@ int Laxer::getsym()
         }
         else
         {
-            error_handle.errorMessage(3, linenum, cc);
+			sym = NEQ; // [容错处理]
+            error_handle.errorMessage(4, linenum, cc);
         }
     }
     else if (isPlus())  // +
@@ -387,6 +401,8 @@ int Laxer::getsym()
         {
             if ((ch <= 126 && ch >= 35) || ch == 32 || ch == 33)
             {
+				if (ch == '\\')
+					catToken();
 				catToken();
                 getChar();
             }
@@ -400,8 +416,8 @@ int Laxer::getsym()
     }
     else
     {
-        string str(token);
-        error_handle.errorMessage(2, linenum, cc, str);
+        string str = getToken();
+        error_handle.errorMessage(102, linenum, cc, str);
     }
 
     return 0;

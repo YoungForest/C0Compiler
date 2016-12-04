@@ -8,16 +8,22 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-//	freopen("middleCode.mc", "w", stdout);
+#ifdef DEBUG
+	freopen("C:/Users/young/Desktop/middleCode.mc", "w", stdout);
+#endif // DEBUG
+
 	if (argc != 3)
 	{
 		printf("Too few or many arguments.\n");
 		exit(1);
 	}
 #ifdef DEBUG
-	cout << "debuging" << __LINE__ << __FILE__ << endl;
+	cout << "debuging   " << __LINE__ << "  " << __FILE__ << endl;
 #endif
 
+#ifdef CB
+	// cout << "test CB" << endl;
+#endif // CB
 
 	string filein;
 	filein = argv[1];
@@ -26,8 +32,8 @@ int main(int argc, char *argv[])
 
 	Parser *parser0 = new Parser(filein);
     parser0->parser(fileout);
-
-	//system("pause");
-
+#ifdef CB
+	system("pause");
+#endif // CB
 	return 0;
 }

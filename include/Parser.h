@@ -18,6 +18,7 @@ class Parser
         void functionIn(std::string s);
         void parserTestPrint(std::string s);  // [调试] 语法分析程序测试程序, 输出 语法成分
 		struct symbolItem* test(std::string ident);	// 测试标识符是否在符号表中
+		void test2(std::string ident, SymbolTable *st);	// 变量定义, 检查是否重复定义
 
         // delete, because distribe this task to lexer char charactor();   // <字符>    ::=  '<加法运算符>'｜'<乘法运算符>'｜'<字母>'｜'<数字>'
         void program(); // <程序>    ::= ［<常量说明>］［<变量说明>］{<有返回值函数定义>|<无返回值函数定义>}<主函数>
@@ -65,6 +66,11 @@ class Parser
 		void addDataGlobal(std::string _str);	// 添加全局声明到data区
 
 		std::string to_string(int i);	// 修复code blocks g++ (tdm-1) 4.7.1 bug
+
+		void errorGenerate(int errortype);
+		void errorGenerate(int errortype, std::string message1);
+		void errorGenerate(int errortype, std::string message1, std::string message2);
+		void warningGenerate(int warningtype, std::string message1);
 
     protected:
     private:

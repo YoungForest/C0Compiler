@@ -13,8 +13,10 @@
 				<Option compiler="gcc" />
 				<Option parameters="14061213_test.txt out.asm" />
 				<Compiler>
+					<Add option="-std=c++11" />
 					<Add option="-Wall" />
 					<Add option="-g" />
+					<Add option="-DCB" />
 					<Add directory="include" />
 				</Compiler>
 			</Target>

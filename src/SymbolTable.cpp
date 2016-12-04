@@ -19,7 +19,15 @@ struct symbolItem* SymbolTable::searchItem(string name)
 {
 	for (int i = 0; i < symbolList.size(); i++)
 		if (symbolList[i]->name == name)
-			return symbolList[i];
+			if (scope == LOCAL)
+				return symbolList[i];
+			else
+			{
+				if (symbolList[i]->kind == PARAMETER)
+					continue;
+				else
+					return symbolList[i];
+			}
     /*if (symbolList.count(name))
         return symbolList[name];
     else

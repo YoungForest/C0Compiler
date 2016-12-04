@@ -46,6 +46,8 @@ class Laxer
         int linenum;                     // 目前编译到的行数
         int sym;                 // 存放最近一次识别出来的token类型
         int cc;                           // 字母计数（列指针）
+		int lastcc;		// [Error] token前的列指针, 用于报错
+		int lastlinenum; // [Error]
         char token[WORD_LENGTH];            // 存储当前单词
         
     protected:
