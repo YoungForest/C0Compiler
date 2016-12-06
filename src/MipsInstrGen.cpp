@@ -372,7 +372,7 @@ void MipsInstrGen::generateInstruction(std::vector<QuaterInstr*>& middleCodes)
 			appendInstruction(MipsCode::sw, "$t9", "-96($sp)");
 			appendInstruction(MipsCode::sw, "$k0", "-100($sp)");
 			appendInstruction(MipsCode::sw, "$k1", "-104($sp)");
-			appendInstruction(MipsCode::subi, "$sp", "$sp", "BASE_OFFSET");
+			appendInstruction(MipsCode::subi, "$sp", "$sp", to_string(BASE_OFFSET));
 			break;
 		case RET:
 			if (current->des == NULL)
