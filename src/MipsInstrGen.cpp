@@ -145,7 +145,7 @@ void MipsInstrGen::dss(QuaterInstr* current, MipsCode _op)
 		appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) + "($fp)");
 }
 
-void MipsInstrGen::generateInstruction(std::vector<QuaterInstr*>& middleCodes)
+void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 {
 	vector<QuaterInstr*>::iterator it = middleCodes.begin();
 	// 所使用的3个寄存器
