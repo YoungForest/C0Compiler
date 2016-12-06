@@ -264,8 +264,9 @@ void Parser::defineVoidFunction()
 	middleCode.gen(Opcode::RET);
 	if (error_handler.isSuccess())
 	{
-		mipsInstrGen.generateInstruction(middleCode.middle_codes);
+		middleCode.optimize();
 		middleCode.printMiddleCode();
+		mipsInstrGen.generateInstruction(middleCode.middle_codes);
 	}
 	middleCode.clear();
 	localTable.clear();
@@ -319,8 +320,9 @@ void Parser::defineReturnFunction(int type, string ident)
 	middleCode.gen(Opcode::RET);
 	if (error_handler.isSuccess())
 	{
-		mipsInstrGen.generateInstruction(middleCode.middle_codes);
+		middleCode.optimize();
 		middleCode.printMiddleCode();
+		mipsInstrGen.generateInstruction(middleCode.middle_codes);
 	}
 	middleCode.clear();
 	localTable.clear();
@@ -339,7 +341,7 @@ void Parser::compoundStatement()
         varietyDenote(localTable);
     }
 	//int offset = localTable.offset;
-	middleCode.gen(Opcode::DSP, "1000");
+	middleCode.gen(Opcode::DSP, to_string(localTable.offset);
     statementList();
     parserTestPrint("compound statement");
 }
@@ -599,8 +601,9 @@ void Parser::mainFunction()
 	middleCode.gen(Opcode::RET);
 	if (error_handler.isSuccess())
 	{
-		mipsInstrGen.generateInstruction(middleCode.middle_codes);
+		middleCode.optimize();
 		middleCode.printMiddleCode();
+		mipsInstrGen.generateInstruction(middleCode.middle_codes);
 	}
 	middleCode.clear();
 	localTable.clear();
@@ -755,6 +758,7 @@ int Parser::integer()
 	{
 		errorGenerate(34);
 	}
+	return 0;
 }
 
 // <语句>    ::= <条件语句>｜<do循环语句> | <for循环语句>｜‘{’<语句列>‘}’｜<函数调用语句>;｜<赋值语句>;｜<读语句>;｜<写语句>;｜<空>;｜<返回语句>;

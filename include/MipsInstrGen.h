@@ -46,6 +46,7 @@ enum Register
 	$a1,
 	$a2,
 	$a3,
+
 	$t0,
 	$t1,
 	$t2,
@@ -54,6 +55,7 @@ enum Register
 	$t5,
 	$t6,
 	$t7,
+	
 	$s0,
 	$s1,
 	$s2,
@@ -62,8 +64,10 @@ enum Register
 	$s5,
 	$s6,
 	$s7,
+	
 	$t8,
 	$t9,
+	// 保留给操作系统(我)
 	$k0,
 	$k1,
 

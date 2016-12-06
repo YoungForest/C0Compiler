@@ -16,6 +16,7 @@ class MiddleCode
 
 		void clear();	// 清空中间代码缓冲区
 		void printMiddleCode();	// [调试] 输出这段中间代码
+		void optimize(); // 优化中间代码
         
         std::vector<QuaterInstr*> middle_codes;	// 中间代码缓冲
     protected:

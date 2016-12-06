@@ -1,4 +1,5 @@
 #include "MipsInstrGen.h"
+#include "SymbolTable.h"
 
 #include <sstream>
 
@@ -371,7 +372,7 @@ void MipsInstrGen::generateInstruction(std::vector<QuaterInstr*>& middleCodes)
 			appendInstruction(MipsCode::sw, "$t9", "-96($sp)");
 			appendInstruction(MipsCode::sw, "$k0", "-100($sp)");
 			appendInstruction(MipsCode::sw, "$k1", "-104($sp)");
-			appendInstruction(MipsCode::subi, "$sp", "$sp", "108");
+			appendInstruction(MipsCode::subi, "$sp", "$sp", "BASE_OFFSET");
 			break;
 		case RET:
 			if (current->des == NULL)

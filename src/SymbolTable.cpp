@@ -6,7 +6,7 @@ using namespace std;
 SymbolTable::SymbolTable(int _scope)
 {
     //ctor
-    offset = 108;
+    offset = BASE_OFFSET;
 	scope = _scope;
 }
 
@@ -101,7 +101,7 @@ int SymbolTable::getPosition(struct symbolItem * elem)
 
 void SymbolTable::clear()
 {
-	offset = 108;
+	offset = BASE_OFFSET;
 	symbolList.clear();
 }
 

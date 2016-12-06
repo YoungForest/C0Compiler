@@ -36,6 +36,7 @@ class SymbolTable
 		int scope;
 };
 
+#define BASE_OFFSET 108
 // ·ûºÅ±í
 // ·ûºÅÀàĞÍ kind
 #define CONSTANT 1
