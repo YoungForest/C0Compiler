@@ -63,7 +63,7 @@ struct symbolItem* SymbolTable::insertItem(string name, int line, int kind, int 
     else if (item->kind == FUNCTION)
     {
         // nothing to do if function
-        // length is the number of value table?
+        // length is the number of value table? yes, but parser set it
     }
     else
     {
