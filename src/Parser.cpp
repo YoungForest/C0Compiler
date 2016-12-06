@@ -236,7 +236,6 @@ void Parser::defineVoidFunction()
                 {
                     laxer.getsym();
                     compoundStatement();
-					middleCode.gen(Opcode::RET);
                     if (laxer.sym == RCURLY)
                     {
                         laxer.getsym();
@@ -262,8 +261,12 @@ void Parser::defineVoidFunction()
 			errorGenerate(12);
 		}
     }
-	mipsInstrGen.generateInstruction(middleCode.middle_codes);
-	middleCode.printMiddleCode();
+	middleCode.gen(Opcode::RET);
+	if (error_handler.isSuccess())
+	{
+		mipsInstrGen.generateInstruction(middleCode.middle_codes);
+		middleCode.printMiddleCode();
+	}
 	middleCode.clear();
 	localTable.clear();
 }
@@ -314,8 +317,11 @@ void Parser::defineReturnFunction(int type, string ident)
 		errorGenerate(12);
 	}
 	middleCode.gen(Opcode::RET);
-	mipsInstrGen.generateInstruction(middleCode.middle_codes);
-	middleCode.printMiddleCode();
+	if (error_handler.isSuccess())
+	{
+		mipsInstrGen.generateInstruction(middleCode.middle_codes);
+		middleCode.printMiddleCode();
+	}
 	middleCode.clear();
 	localTable.clear();
 }
@@ -591,8 +597,11 @@ void Parser::mainFunction()
 		}
     }
 	middleCode.gen(Opcode::RET);
-	mipsInstrGen.generateInstruction(middleCode.middle_codes);
-	middleCode.printMiddleCode();
+	if (error_handler.isSuccess())
+	{
+		mipsInstrGen.generateInstruction(middleCode.middle_codes);
+		middleCode.printMiddleCode();
+	}
 	middleCode.clear();
 	localTable.clear();
 }
@@ -1135,6 +1144,8 @@ void Parser::assignStatement(string ident)
 {
     functionIn("assignStatement");
 	struct symbolItem* des = test(ident);
+	if (des->kind != VARIABLE && des->kind != PARAMETER)
+		errorGenerate(112, ident);
     if (laxer.sym == BECOMES)
     {
         laxer.getsym();

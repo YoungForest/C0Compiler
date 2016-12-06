@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#define _ERROR_FATAL
+//#define _ERROR_FATAL
 
 using namespace std;
 
@@ -88,6 +88,8 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
 	case 104: Message << message1 << " parameters needed while more are given !" << endl; break;
 	case 106: Message <<  message1 << " parameters needed while fewer are given !" << endl; break;
 	case 108: Message << message1 << " is a void function while not a return function, which can not using in a expression!" << endl; break;
+	case 110: Message << "a function needed before '(', while " << message1 << " are given! " << endl; break;
+	case 112: Message << message1 << " at the left of = is not assignable!" << endl; break;
 
 	default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
