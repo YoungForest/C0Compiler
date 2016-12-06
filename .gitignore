@@ -13,3 +13,5 @@ obj/
 
 # final codes files
 *.asm
+out.asm
+*.asm
