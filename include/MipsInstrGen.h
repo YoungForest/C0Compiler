@@ -32,7 +32,8 @@ enum MipsCode
 	beqz,
 	move,
 	li,
-	syscall
+	syscall,
+	comment
 };
 
 // useless
@@ -152,6 +153,8 @@ public:
 			return "j";
 		case jr:
 			return "jr";
+		case comment:
+			return "#";
 		default:
 			return "null";
 		}
