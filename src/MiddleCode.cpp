@@ -89,7 +89,9 @@ void MiddleCode::optimize()
 void MiddleCode::load()
 {
 	Block *newblock = nullptr, *preblock = nullptr;
-	for (int i = 0; i < flag.size(); i++)
+	functionDeclaration = middle_codes[0];
+	initalStack = middle_codes[1];
+	for (int i = 2; i < flag.size(); i++)
 	{
 		if (flag[i] == 1)
 		{
@@ -127,6 +129,8 @@ void MiddleCode::load()
 void MiddleCode::store()
 {
 	middle_codes.clear();
+	middle_codes.push_back(functionDeclaration);
+	middle_codes.push_back(initalStack);
 	for (auto it = basicBlocks.cbegin(); it != basicBlocks.cend(); it++)
 	{
 		for (auto it2 = (*it)->middleCode.cbegin(); it2 != (*it)->middleCode.cend(); it2++)

@@ -26,6 +26,8 @@ class MiddleCode
 		std::vector<int> flag;	// 判断该指令是否是基本块的入口
 		std::vector<Block *> basicBlocks;	// 基本块数组
         std::vector<QuaterInstr *> middle_codes;	// 中间代码缓冲
+		QuaterInstr *functionDeclaration;
+		QuaterInstr *initalStack;
     protected:
     private:
 		bool preQuaterInstructionIsJumpOrBranch = false;
