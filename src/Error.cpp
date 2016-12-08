@@ -65,14 +65,12 @@ void Error::errorMessage(int errortype,int line, int column) {
         break;
     }
     error_messages.push_back(Message.str());
-#ifdef _ERROR_FATAL
 	printWarnings();
 	printErrors();
 #ifdef CB
 	system("pause");
 #endif // CB
 	exit(0);
-#endif
 }
 
 void Error::errorMessage(int errortype, int line, int column, string message1) {
@@ -82,7 +80,6 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
     switch (errortype)
     {
 	case 1: Message << message1 << endl; break;
-    case 101: Message << "Parse error " << message1 << " !" << endl; break;
     case 102: Message << "Can't recongnize this token " << message1 << endl; break;
 	case 103: Message << "Undefined identifier : " << message1 << " !" << endl; break;
 	case 104: Message << message1 << " parameters needed while more are given !" << endl; break;
@@ -96,14 +93,15 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
     }
     error_messages.push_back(Message.str());
 
-#ifdef _ERROR_FATAL
-	printWarnings();
-	printErrors();
+	if (errortype == 102 || errortype == 110)
+	{
+		printWarnings();
+		printErrors();
 #ifdef CB
-	system("pause");
+		system("pause");
 #endif // CB
-	exit(0);
-#endif
+		exit(0);
+	}
 }
 
 void Error::errorMessage(int errortype, int line, int column, string message1, string message2) {
