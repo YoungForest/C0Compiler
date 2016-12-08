@@ -91,12 +91,16 @@ void MiddleCode::load()
 	Block *newblock = nullptr, *preblock = nullptr;
 	functionDeclaration = middle_codes[0];
 	initalStack = middle_codes[1];
+	newblock = new Block();
+	basicBlocks.push_back(newblock);
+
 	for (int i = 2; i < flag.size(); i++)
 	{
 		if (flag[i] == 1)
 		{
 			preblock = newblock;
-			newblock = new Block();
+			if (i > 2)	//	解决第一条指令就是 标签指令
+				newblock = new Block();
 			newblock->middleCode.push_back(middle_codes[i]);
 			if (preblock != nullptr && preblock->middleCode.back()->op != Opcode::JUMP && preblock->middleCode.back()->op != Opcode::RET)	// 更新前驱和后继
 			{

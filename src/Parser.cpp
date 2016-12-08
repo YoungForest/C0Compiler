@@ -1195,11 +1195,11 @@ struct symbolItem* Parser::callFunction(string ident)
     if (laxer.sym == LPARENT)
     {
         laxer.getsym();
+		middleCode.gen(Opcode::CALL, func->name);	// 先调用函数, 后填参数. 优化后顺序颠倒
         valueParameterTable(func);
         if (laxer.sym == RPARENT)
         {
             laxer.getsym();
-			middleCode.gen(Opcode::CALL, func->name);
 			if (func->type != VOID_TYPE)
 			{
 				if (func->type == INT_TYPE)

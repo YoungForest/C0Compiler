@@ -1,116 +1,127 @@
 #include "DAGmanager.h"
 
-DAGmanager::DAGmanager()
-{
-    //ctor
-}
+using namespace std;
 
 DAGmanager::~DAGmanager()
 {
     //dtor
 }
 
+
+int DAGmanager::findsymbol(symbolItem *needfind)
+{
+	bool find = false;
+	for (auto it = symbollist.cbegin(); it != symbollist.cend(); it++)
+	{
+		if ((*it).item == needfind)	// 找到 符号项
+		{
+			find = true;
+			return (*it).index;
+		}
+	}
+return -1;
+}
+
+int DAGmanager::addsymbolandnode(symbolItem * needadd)
+{
+	node new_node;
+	if (needadd->kind == VARIABLE)
+		new_node.name = needadd->name + "0";
+	else
+		new_node.name = needadd->name;
+	symbol new_symbol;
+	new_symbol.index = nodelist.size();
+	nodelist.push_back(new_node);
+	new_symbol.item = needadd;
+	symbollist.push_back(new_symbol);
+	return 0;
+}
+
+int DAGmanager::addsymbol(symbolItem * needadd, int index)
+{
+	symbol new_symbol;
+	new_symbol.index = index;
+	new_symbol.item = needadd;
+	symbollist.push_back(new_symbol);
+	return symbollist.size() - 1;
+}
+
+void DAGmanager::updateDesInSymbolList(symbolItem * des, int k)
+{
+	if (findsymbol(des) == -1)
+	{
+		symbollist[findsymbol(des)].index = k;
+	}
+	else
+	{
+		addsymbol(des, k);
+	}
+}
+
+int DAGmanager::findSrcInSymbolList(symbolItem * src)
+{
+	if (findsymbol(src) == -1)
+	{
+		return symbollist[addsymbolandnode(src)].index;
+	}
+	else
+	{
+		return symbollist[findsymbol(src)].index;
+	}
+}
+
+int DAGmanager::findOprator(string _op, int left, int right)
+{
+	int k;	// symbol.index
+	bool find = false;
+	for (int i = 0; i < nodelist.size(); i++)
+	{
+		if (nodelist[i].name == _op && nodelist[i].leftchild == left && nodelist[i].rightchild == right)	// 找到op
+		{
+			find = true;
+			k = i;
+			break;
+		}
+	}
+	if (!find)
+	{
+		node new_node;
+		new_node.leftchild = left;
+		new_node.rightchild = right;
+		new_node.name = _op;
+		k = nodelist.size();
+	}
+	return k;
+}
+
 void DAGmanager::buildDAG()
 {
 	for (auto it = block.cbegin(); it != block.cend(); it++)
 	{
-		bool find;
 		int left, right, k;
 		if ((*it)->op == Opcode::ADD || (*it)->op == Opcode::SUB || (*it)->op == Opcode::MUL || (*it)->op == Opcode::DIV)
 		{
 			// left x
-			find = false;
-			for (auto it2 = symbollist.cbegin(); it2 != symbollist.cend(); it2++)
-			{
-				if ((*it2).item == (*it)->src1)	// 找到x
-				{
-					find = true;
-					left = (*it2).index;
-					break;
-				}
-			}
-			if (!find)	// 没找到x, 新建叶节点, 并加入节点表
-			{
-				node new_node;
-				if ((*it)->src1->kind == VARIABLE)
-					new_node.name = (*it)->src1->name + "0";
-				else
-					new_node.name = (*it)->src1->name;
-				symbol new_symbol;
-				new_symbol.index = nodelist.size();
-				left = new_symbol.index;
-				nodelist.push_back(new_node);
-				new_symbol.item = (*it)->src1;
-				symbollist.push_back(new_symbol);
-			}
+			left = findSrcInSymbolList((*it)->src1);
 			//right y
-			find = false;
-			for (auto it2 = symbollist.cbegin(); it2 != symbollist.cend(); it2++)
-			{
-				if ((*it2).item == (*it)->src2)	// 找到y
-				{
-					find = true;
-					right = (*it2).index;
-					break;
-				}
-			}
-			if (!find)	// 没找到y, 新建叶节点, 并加入节点表
-			{
-				node new_node;
-				if ((*it)->src2->kind == VARIABLE)
-					new_node.name = (*it)->src2->name + "0";
-				else
-					new_node.name = (*it)->src2->name;
-				symbol new_symbol;
-				new_symbol.index = nodelist.size();
-				right = new_symbol.index;
-				nodelist.push_back(new_node);
-				new_symbol.item = (*it)->src2;
-				symbollist.push_back(new_symbol);
-			}
+			right = findSrcInSymbolList((*it)->src2);
 			// op
-			find = false;
-			for (int i = 0; i < nodelist.size(); i++)
-			{
-				if (nodelist[i].name == (*it)->getOpcode() && nodelist[i].leftchild == left && nodelist[i].rightchild == right)	// 找到op
-				{
-					find = true;
-					k = i;
-					break;
-				}
-			}
-			if (!find)
-			{
-				node new_node;
-				new_node.leftchild = left;
-				new_node.rightchild = right;
-				new_node.name = (*it)->getOpcode();
-				k = nodelist.size();
-			}
+			k = findOprator((*it)->getOpcode(), left, right);
 			// update z
-			find = false;
-			for (auto it2 = symbollist.begin(); it2 != symbollist.end(); it2++)
-			{
-				if ((*it2).item == (*it)->des)	// 找到z
-				{
-					find = true;
-					(*it2).index = k;
-					break;
-				}
-			}
-			if (!find)	// 没找到z, 并symbollist
-			{
-				symbol new_symbol;
-				new_symbol.index = k;
-				new_symbol.item = (*it)->des;
-				symbollist.push_back(new_symbol);
-			}
+			updateDesInSymbolList((*it)->des, k);
 		}
 		else if ((*it)->op == Opcode::NEG)
 		{
-
+			left = findSrcInSymbolList((*it)->src1);
+			k = findOprator((*it)->getOpcode(), left);
+			updateDesInSymbolList((*it)->des, k);
 		}
 		else if ((*it)->op == Opcode::ASS)
+		{
+			k = findSrcInSymbolList((*it)->src1);
+			updateDesInSymbolList((*it)->des, k);
+		}
+		else if ((*it)->op == Opcode::LAV)
 		{
 
 		}
