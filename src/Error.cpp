@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 
-//#define _ERROR_FATAL
+#define _ERROR_FATAL
 
 using namespace std;
 
@@ -71,6 +71,14 @@ void Error::errorMessage(int errortype,int line, int column) {
 	system("pause");
 #endif // CB
 	exit(0);
+#ifdef _ERROR_FATAL
+	printWarnings();
+	printErrors();
+#ifdef CB
+	system("pause");
+#endif // CB
+	exit(0);
+#endif
 }
 
 void Error::errorMessage(int errortype, int line, int column, string message1) {
@@ -82,18 +90,19 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
 	case 1: Message << message1 << endl; break;
     case 102: Message << "Can't recongnize this token " << message1 << endl; break;
 	case 103: Message << "Undefined identifier : " << message1 << " !" << endl; break;
+	case 116: Message << "Undefined function : " << message1 << " !" << endl; break;
 	case 104: Message << message1 << " parameters needed while more are given !" << endl; break;
 	case 106: Message <<  message1 << " parameters needed while fewer are given !" << endl; break;
 	case 108: Message << message1 << " is a void function while not a return function, which can not using in a expression!" << endl; break;
 	case 110: Message << "a function needed before '(', while " << message1 << " are given! " << endl; break;
 	case 112: Message << message1 << " at the left of = is not assignable!" << endl; break;
-
+	case 114: Message << "function parameter has the same name with function " << message1 << endl; break;
 	default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
     }
     error_messages.push_back(Message.str());
 
-	if (errortype == 102 || errortype == 110)
+	if (errortype == 102 || errortype == 110 || errortype == 116)
 	{
 		printWarnings();
 		printErrors();
@@ -102,6 +111,14 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
 #endif // CB
 		exit(0);
 	}
+#ifdef _ERROR_FATAL
+	printWarnings();
+	printErrors();
+#ifdef CB
+	system("pause");
+#endif // CB
+	exit(0);
+#endif
 }
 
 void Error::errorMessage(int errortype, int line, int column, string message1, string message2) {
@@ -132,7 +149,8 @@ void Error::warningMessage(int warningtype, int line, int column, std::string me
 	warning_count++;
 	switch (warningtype)
 	{
-	case 301: Message <<  "out range of int " << message1 << endl; break;
+	case 302: Message <<  "out range of int " << message1 << endl; break;
+	case 304: Message << "it is a too big number which lenght > 10?   " << message1 << endl; break;
 	default: Message << "Unhandled error " << warningtype << " !" << endl;
 		break;
 	}

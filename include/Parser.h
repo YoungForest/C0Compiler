@@ -35,7 +35,7 @@ class Parser
         void defineVoidFunction();
 
         void compoundStatement();  // <复合语句>   ::=  ［<常量说明>］［<变量说明>］<语句列>
-        int parameterTable();  // <参数表>    ::=  <类型标识符><标识符>{,<类型标识符><标识符>}| <空>
+        int parameterTable(std::string functionName);  // <参数表>    ::=  <类型标识符><标识符>{,<类型标识符><标识符>}| <空>
         void mainFunction();    // <主函数>    ::= void main‘(’‘)’ ‘{’<复合语句>‘}’
 
         struct symbolItem* item();  // <因子>{<乘法运算符><因子>}

@@ -9,6 +9,7 @@
 #include <ctime>
 #include <chrono>
 
+//#define OPTIMIZE
 
 using namespace std;
 
@@ -50,13 +51,17 @@ void Parser::warningGenerate(int warningtype, std::string message1)
 // [调试]
 void Parser::parserTestPrint(string s)
 {
-    //cout << "Line : " << laxer.linenum << " column : " << laxer.cc << ".   This is a " << s << " ! " << endl;
+#ifdef DEBUG
+	cout << "Line : " << laxer.linenum << " column : " << laxer.cc << ".   This is a " << s << " ! " << endl;
+#endif // DEBUG
 }
 
 // [调试]
 void Parser::functionIn(string s)
 {
-     //cout << "Function in " << s << endl;
+#ifdef DEBUG
+	cout << "Function in " << s << endl;
+#endif // DEBUG
 }
 
 // 根据变量名, 查找符号表, 如果未找到报错 
@@ -65,7 +70,7 @@ struct symbolItem* Parser::test(string ident)
 	SymbolTable* st;
 	st = &localTable;
 #ifdef DEBUG
-	//cout << ident << endl;
+	cout << ident << endl;
 #endif // DEBUG
 
     struct symbolItem* re = st->searchItem(ident);
@@ -106,6 +111,7 @@ void Parser::parser(string fileout)
 	}
 	else
 	{
+		cout << endl << "Compiled success!" << endl;
 		// 将全局变量输出到.data缓冲数组中
 		vector<struct symbolItem*>::iterator it = globalTable.symbolList.begin();
 		while (it != globalTable.symbolList.end())
@@ -225,12 +231,12 @@ void Parser::defineVoidFunction()
         if (laxer.sym == LPARENT)
         {
             laxer.getsym();
-            length = parameterTable();
+			test2(ident, &globalTable);
+			struct symbolItem* f = globalTable.insertItem(ident, laxer.linenum, FUNCTION, VOID_TYPE, 0, length);
+            length = parameterTable(ident);
+			f->length = length;
             if (laxer.sym == RPARENT)
             {
-				test2(ident, &globalTable);
-				globalTable.insertItem(ident, laxer.linenum, FUNCTION, VOID_TYPE, 0, length);
-				struct symbolItem* f = test(ident);
 				middleCode.gen(Opcode::DEC, f);
                 laxer.getsym();
                 if (laxer.sym == LCURLY)
@@ -284,10 +290,10 @@ void Parser::defineReturnFunction(int type, string ident)
     if (laxer.sym == LPARENT)
     {
         laxer.getsym();
-        length = parameterTable();
 		test2(ident, &globalTable);
-		globalTable.insertItem(ident, laxer.linenum, FUNCTION, type, 0, length);
-		struct symbolItem* f = test(ident);
+		struct symbolItem* f = globalTable.insertItem(ident, laxer.linenum, FUNCTION, type, 0, length);
+		length = parameterTable(ident);
+		f->length = length;
 		middleCode.gen(Opcode::DEC, f);
         if (laxer.sym == RPARENT)
         {
@@ -349,6 +355,7 @@ void Parser::compoundStatement()
 #ifdef OPTIMIZE
 	middleCode.gen(Opcode::DSP, to_string(localTable.offset));
 #else
+	middleCode.gen(Opcode::DSP, "1500");
 #endif // OPTIMIZE
     statementList();
     parserTestPrint("compound statement");
@@ -502,7 +509,7 @@ void Parser::varietyDenote(SymbolTable &table, int type, string ident)
 }
 
 // [返回值] 参数数量
-int Parser::parameterTable()
+int Parser::parameterTable(string functionName)
 {
 	int count = 0;
 	int type;
@@ -520,6 +527,9 @@ int Parser::parameterTable()
 			count++;
 			ident = laxer.getToken();
             laxer.getsym();
+			if (ident == functionName)
+				errorGenerate(114, ident);
+			test2(ident, &localTable);
 			struct symbolItem * para = localTable.insertItem(ident, laxer.linenum, PARAMETER, type);
 			globalTable.insertItem(ident, laxer.linenum, PARAMETER, type, para->valueoroffset);
         }
@@ -1201,6 +1211,8 @@ struct symbolItem* Parser::callFunction(string ident)
 {
     functionIn("callFunction");
 	struct symbolItem* func = test(ident);
+	if (func == NULL)
+		errorGenerate(116, ident);
 	struct symbolItem* re = NULL;
     if (laxer.sym == LPARENT)
     {
@@ -1248,26 +1260,31 @@ void Parser::valueParameterTable(struct symbolItem* func)
     }
     else
     {
-		int count = func->length;
+		int count = 0;
 		int base = globalTable.getPosition(func);
         struct symbolItem* re = expression();
-		struct symbolItem* index = globalTable.symbolList[base - (count--)];
-		middleCode.gen(Opcode::PUSH, re, index);
-        while (laxer.sym == COMMA)
-        {
-			if (count <= 0)
-			{
-				errorGenerate(104, to_string(func->length));	//error
-				break;
-			}
-            laxer.getsym();
-            re = expression();
-			index = globalTable.symbolList[base - (count--)];
-			middleCode.gen(Opcode::PUSH, re, index);
-        }
-		if (count > 0)
+		if (func->length == 0)
+			errorGenerate(104, to_string(func->length));
+		else
 		{
-			errorGenerate(106, to_string(func->length));
+			struct symbolItem* index = globalTable.symbolList[base + (++count)];
+			middleCode.gen(Opcode::PUSH, re, index);
+			while (laxer.sym == COMMA)
+			{
+				if (count > func->length)
+				{
+					errorGenerate(104, to_string(func->length));	//error
+					break;
+				}
+				laxer.getsym();
+				re = expression();
+				index = globalTable.symbolList[base + (++count)];
+				middleCode.gen(Opcode::PUSH, re, index);
+			}
+			if (count < func->length)
+			{
+				errorGenerate(106, to_string(func->length));
+			}
 		}
     }
     parserTestPrint("value parameter table");
