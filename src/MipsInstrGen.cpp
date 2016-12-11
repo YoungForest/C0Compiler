@@ -40,7 +40,7 @@ void MipsInstrGen::lss(QuaterInstr* current, MipsCode _op)
 	string t0 = "$t0";
 	string t1 = "$t1";
 	string t2 = "$t2";
-	if (current->src1->kind == CONSTANT && current->src2->kind == CONSTANT)
+	if (current->src1->kind == CONSTANT && current->src2->kind == CONSTANT)	// 常量合并
 	{
 		switch (_op)
 		{
@@ -71,7 +71,6 @@ void MipsInstrGen::lss(QuaterInstr* current, MipsCode _op)
 		default:
 			break;
 		}
-		appendInstruction(MipsCode::li, t1, to_string(current->src1->valueoroffset + current->src2->valueoroffset));
 	}
 	else if (current->src1->kind == CONSTANT && current->src2->kind != CONSTANT)
 	{
@@ -200,7 +199,10 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) + "(" + t1 + ")");
 				}
 			}
-			appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) +"($fp)");
+			if (current->des->scope == GLOBAL)
+				appendInstruction(MipsCode::sw, t0, current->des->name);
+			else
+				appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) +"($fp)");
 			break;
 		case SAV:
 			if (current->des->kind == CONSTANT)
@@ -242,6 +244,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 				}
 			}
 			break;
+		// check there
 		case NEG:
 			if (current->src1->kind == CONSTANT)
 			{

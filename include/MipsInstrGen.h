@@ -172,8 +172,8 @@ class MipsInstrGen
 		void appendInstruction(MipsCode _op, std::string _des = "", std::string _src1 = "", std::string _src2 = "");
 		void generateInstruction(std::vector<Block *> &blocks);	// 以基本块为单位生成目标代码
 		void generateInstruction(std::vector<QuaterInstr*>& middleCodes);	// 根据中间代码生成目标代码
-		void dss(QuaterInstr* current, MipsCode _op);	// dss 型四元式
-		void lss(QuaterInstr* current, MipsCode _op);	// lss 型四元式
+		void dss(QuaterInstr* current, MipsCode _op);	// dss 型四元式 des src src
+		void lss(QuaterInstr* current, MipsCode _op);	// lss 型四元式 label src src
 		std::string to_string(int i);	// 修复code blocks g++ (tdm-1) 4.7.1 bug
 
 
