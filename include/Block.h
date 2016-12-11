@@ -8,7 +8,7 @@
 class Block
 {
     public:
-        Block();
+		Block() : st(GLOBAL) {};
         virtual ~Block();
 
 		std::vector<QuaterInstr *> middleCode;	// 基本块中包含的四元式

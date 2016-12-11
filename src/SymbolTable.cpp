@@ -19,6 +19,7 @@ struct symbolItem* SymbolTable::searchItem(string name)
 {
 	for (int i = 0; i < symbolList.size(); i++)
 		if (symbolList[i]->name == name)
+		{
 			if (scope == LOCAL)
 				return symbolList[i];
 			else
@@ -28,6 +29,7 @@ struct symbolItem* SymbolTable::searchItem(string name)
 				else
 					return symbolList[i];
 			}
+		}
     /*if (symbolList.count(name))
         return symbolList[name];
     else

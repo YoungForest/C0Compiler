@@ -72,9 +72,9 @@ void MiddleCode::optimize()
 {
 	load();
 
-	for each (auto it in basicBlocks)
+	for (auto it = basicBlocks.begin(); it != basicBlocks.end(); it++)
 	{
-		DAGmanager dag(it->middleCode, it->st);
+		DAGmanager dag(*(*it), (*it)->st);
 		dag.buildDAG();
 		dag.regenerateMiddleCode();
 	}

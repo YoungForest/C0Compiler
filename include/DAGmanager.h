@@ -35,7 +35,7 @@ class DAGmanager
 		int addsymbol(symbolItem * needadd, int index);	// 仅向结点表添加一项
 		void updateDesInSymbolList(symbolItem *des, int k);	// 更新symbolList for des
 		int findSrcInSymbolList(symbolItem *src);	// 在symbollist中查找src, 返回节点号
-		int findOprator(string _op, int left = -1, int right = -1);	// 在DAG图中寻找操作符, 如果没找到新建节点, 返回节点在nodelist中的index
+		int findOprator(std::string _op, int left = -1, int right = -1);	// 在DAG图中寻找操作符, 如果没找到新建节点, 返回节点在nodelist中的index
 		void buildDAG();	// 构建DAG图
 		void regenerateMiddleCode();	// 根据DAG图重新生成中间代码
 		int newFunctionCall();	// 在functionCallList中新加一项, 返回下标

@@ -131,3 +131,17 @@ void DAGmanager::buildDAG()
 		}
 	}
 }
+
+void DAGmanager::regenerateMiddleCode()
+{
+}
+
+int DAGmanager::newFunctionCall()
+{
+	return 0;
+}
+
+int DAGmanager::addParameter(int functionIndex, symbolItem * formalPara, int nodeindex)
+{
+	return 0;
+}

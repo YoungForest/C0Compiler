@@ -9,6 +9,7 @@
 #include <ctime>
 #include <chrono>
 
+
 using namespace std;
 
 Parser::~Parser()
@@ -264,7 +265,9 @@ void Parser::defineVoidFunction()
 	middleCode.gen(Opcode::RET);
 	if (error_handler.isSuccess())
 	{
+#ifdef OPTIMIZE
 		middleCode.optimize();
+#endif // OPTIMIZE
 		middleCode.printMiddleCode();
 		mipsInstrGen.generateInstruction(middleCode.middle_codes);
 	}
@@ -320,7 +323,9 @@ void Parser::defineReturnFunction(int type, string ident)
 	middleCode.gen(Opcode::RET);
 	if (error_handler.isSuccess())
 	{
+#ifdef OPTIMIZE
 		middleCode.optimize();
+#endif // OPTIMIZE
 		middleCode.printMiddleCode();
 		mipsInstrGen.generateInstruction(middleCode.middle_codes);
 	}
@@ -341,7 +346,10 @@ void Parser::compoundStatement()
         varietyDenote(localTable);
     }
 	//int offset = localTable.offset;
-	middleCode.gen(Opcode::DSP, to_string(localTable.offset);
+#ifdef OPTIMIZE
+	middleCode.gen(Opcode::DSP, to_string(localTable.offset));
+#else
+#endif // OPTIMIZE
     statementList();
     parserTestPrint("compound statement");
 }
@@ -601,7 +609,9 @@ void Parser::mainFunction()
 	middleCode.gen(Opcode::RET);
 	if (error_handler.isSuccess())
 	{
+#ifdef OPTIMIZE
 		middleCode.optimize();
+#endif // OPTIMIZE
 		middleCode.printMiddleCode();
 		mipsInstrGen.generateInstruction(middleCode.middle_codes);
 	}
@@ -1195,11 +1205,17 @@ struct symbolItem* Parser::callFunction(string ident)
     if (laxer.sym == LPARENT)
     {
         laxer.getsym();
+#ifdef OPTIMIZE
 		middleCode.gen(Opcode::CALL, func->name);	// 先调用函数, 后填参数. 优化后顺序颠倒
+#endif // OPTIMIZE
+
         valueParameterTable(func);
         if (laxer.sym == RPARENT)
         {
             laxer.getsym();
+#ifndef OPTIMIZE
+			middleCode.gen(Opcode::CALL, func->name);	// 先调用函数, 后填参数. 优化后顺序颠倒
+#endif // !OPTIMIZE
 			if (func->type != VOID_TYPE)
 			{
 				if (func->type == INT_TYPE)
