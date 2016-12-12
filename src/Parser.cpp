@@ -64,7 +64,7 @@ void Parser::functionIn(string s)
 #endif // DEBUG
 }
 
-// 根据变量名, 查找符号表, 如果未找到报错 
+// 根据变量名, 查找符号表, 如果未找到报错
 struct symbolItem* Parser::test(string ident)
 {
 	SymbolTable* st;
@@ -286,7 +286,7 @@ void Parser::defineReturnFunction(int type, string ident)
 {
 	int length = 0;
     functionIn("defineReturnFunction");
-	
+
     if (laxer.sym == LPARENT)
     {
         laxer.getsym();
@@ -766,7 +766,7 @@ int Parser::integer()
 				re = -re;
 			laxer.getsym();
 			parserTestPrint("integer");
-			
+
 			return re;
 		}
 		else
@@ -861,6 +861,10 @@ void Parser::statement()
             {
                 laxer.getsym();
             }
+            else
+            {
+                errorGenerate(26);
+            }
         }
         else if (laxer.sym == LPARENT)
         {
@@ -868,6 +872,10 @@ void Parser::statement()
             if (laxer.sym == SEMICOLON)
             {
                 laxer.getsym();
+            }
+            else
+            {
+                errorGenerate(26);
             }
         }
         else
@@ -886,7 +894,7 @@ void Parser::statement()
 void Parser::condition(struct symbolItem *&cmp1, struct symbolItem* &cmp2, int &cmpOp)
 {
     functionIn("condition");
-	
+
     cmp1 = expression();
     if (laxer.sym == LSS || laxer.sym == LEQ || laxer.sym == GTR ||laxer.sym == GEQ || laxer.sym == NEQ || laxer.sym == EQL)
     {
@@ -1251,7 +1259,7 @@ struct symbolItem* Parser::callFunction(string ident)
 }
 
 // <值参数表> := <表达式> {,<表达式>} | 空
-void Parser::valueParameterTable(struct symbolItem* func) 
+void Parser::valueParameterTable(struct symbolItem* func)
 {
     functionIn("valueParameterTable");
     if (laxer.sym == RPARENT)
@@ -1367,7 +1375,7 @@ void Parser::write()
     {
         laxer.getsym();
         if (laxer.sym == LPARENT)
-        {	 
+        {
             laxer.getsym();
             if (laxer.sym == STRING)
             {
