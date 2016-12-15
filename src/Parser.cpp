@@ -52,7 +52,7 @@ void Parser::warningGenerate(int warningtype, std::string message1)
 void Parser::parserTestPrint(string s)
 {
 #ifdef DEBUG
-	cout << "Line : " << laxer.linenum << " column : " << laxer.cc << ".   This is a " << s << " ! " << endl;
+	//cout << "Line : " << laxer.linenum << " column : " << laxer.cc << ".   This is a " << s << " ! " << endl;
 #endif // DEBUG
 }
 
@@ -60,7 +60,7 @@ void Parser::parserTestPrint(string s)
 void Parser::functionIn(string s)
 {
 #ifdef DEBUG
-	cout << "Function in " << s << endl;
+	//cout << "Function in " << s << endl;
 #endif // DEBUG
 }
 
@@ -70,7 +70,7 @@ struct symbolItem* Parser::test(string ident)
 	SymbolTable* st;
 	st = &localTable;
 #ifdef DEBUG
-	cout << ident << endl;
+	//cout << ident << endl;
 #endif // DEBUG
 
     struct symbolItem* re = st->searchItem(ident);
@@ -1056,7 +1056,21 @@ void Parser::forCycleStatement()
                     if (laxer.sym == SEMICOLON)
                     {
                         laxer.getsym();
+						middleCode.gen(Opcode::SET, "forcmp" + to_string(count));
                         condition(cmpl, cmpr, cmpOp);
+						// LSS || LEQ || GTR || GEQ || NEQ || EQL
+						switch (cmpOp)
+						{
+						case NULL: middleCode.gen(Opcode::BEZ, "forend" + to_string(count), cmpl); break;
+						case LSS: middleCode.gen(Opcode::BGE, "forend" + to_string(count), cmpl, cmpr); break;
+						case LEQ: middleCode.gen(Opcode::BGT, "forend" + to_string(count), cmpl, cmpr); break;
+						case GTR: middleCode.gen(Opcode::BLE, "forend" + to_string(count), cmpl, cmpr); break;
+						case GEQ: middleCode.gen(Opcode::BLT, "forend" + to_string(count), cmpl, cmpr); break;
+						case NEQ: middleCode.gen(Opcode::BEQ, "forend" + to_string(count), cmpl, cmpr); break;
+						case EQL: middleCode.gen(Opcode::BNE, "forend" + to_string(count), cmpl, cmpr); break;
+						default: errorGenerate(42);	// error
+							break;
+						}
                         if (laxer.sym == SEMICOLON)
                         {
                             laxer.getsym();
@@ -1086,28 +1100,14 @@ void Parser::forCycleStatement()
                                                 laxer.getsym();
                                                 if (laxer.sym == RPARENT)
                                                 {
-													middleCode.gen(Opcode::JUMP, "forcmp" + to_string(count));
-													middleCode.gen(Opcode::SET, "forbegin" + to_string(count));
                                                     laxer.getsym();
                                                     statement();
 													if (plus)
 														middleCode.gen(Opcode::ADD, ident2, ident3, usdint);
 													else
 														middleCode.gen(Opcode::SUB, ident2, ident3, usdint);
-													middleCode.gen(Opcode::SET, "forcmp" + to_string(count));
-													// LSS || LEQ || GTR || GEQ || NEQ || EQL
-													switch (cmpOp)
-													{
-													case NULL: middleCode.gen(Opcode::BNZ, "forbegin" + to_string(count), cmpl); break;
-													case LSS: middleCode.gen(Opcode::BLT, "forbegin" + to_string(count), cmpl, cmpr); break;
-													case LEQ: middleCode.gen(Opcode::BLE, "forbegin" + to_string(count), cmpl, cmpr); break;
-													case GTR: middleCode.gen(Opcode::BGT, "forbegin" + to_string(count), cmpl, cmpr); break;
-													case GEQ: middleCode.gen(Opcode::BGE, "forbegin" + to_string(count), cmpl, cmpr); break;
-													case NEQ: middleCode.gen(Opcode::BNE, "forbegin" + to_string(count), cmpl, cmpr); break;
-													case EQL: middleCode.gen(Opcode::BEQ, "forbegin" + to_string(count), cmpl, cmpr); break;
-													default: errorGenerate(42);	// error
-														break;
-													}
+													middleCode.gen(Opcode::JUMP, "forcmp" + to_string(count));
+													middleCode.gen(Opcode::SET, "forend" + to_string(count));
                                                 }
 												else
 												{
