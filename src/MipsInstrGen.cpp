@@ -108,7 +108,25 @@ void MipsInstrGen::dss(QuaterInstr* current, MipsCode _op)
 	string t1 = "$t1";
 	string t2 = "$t2";
 	if (current->src1->kind == CONSTANT && current->src2->kind == CONSTANT)
-		appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset + current->src2->valueoroffset));
+	{
+		switch (_op)	
+		{
+		case MipsCode::add:
+			appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset + current->src2->valueoroffset));
+			break;
+		case MipsCode::sub:
+			appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset - current->src2->valueoroffset));
+			break;
+		case MipsCode::mul:
+			appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset * current->src2->valueoroffset));
+			break;
+		case MipsCode::divi:
+			appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset / current->src2->valueoroffset));
+			break;
+		default:
+			break;
+		}
+	}
 	else if (current->src1->kind == CONSTANT && current->src2->kind != CONSTANT)
 	{
 		if (current->src2->scope == GLOBAL)
@@ -244,7 +262,6 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 				}
 			}
 			break;
-		// check there
 		case NEG:
 			if (current->src1->kind == CONSTANT)
 			{
@@ -375,7 +392,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			appendInstruction(MipsCode::sw, "$t9", "-96($sp)");
 			appendInstruction(MipsCode::sw, "$k0", "-100($sp)");
 			appendInstruction(MipsCode::sw, "$k1", "-104($sp)");
-			appendInstruction(MipsCode::subi, "$sp", "$sp", to_string(BASE_OFFSET));
+			appendInstruction(MipsCode::sub, "$sp", "$sp", to_string(BASE_OFFSET));
 			break;
 		case RET:
 			if (current->des == NULL)
@@ -425,7 +442,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			appendInstruction(MipsCode::jr, "$ra");
 			break;
 		case DSP:
-			appendInstruction(MipsCode::subi, "$sp", "$sp", current->label);
+			appendInstruction(MipsCode::sub, "$sp", "$sp", current->label);
 			break;
 		case READ:
 			if (current->des->type == INT_TYPE)

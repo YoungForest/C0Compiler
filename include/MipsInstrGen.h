@@ -13,9 +13,7 @@ enum MipsCode
 	sw,
 	sb,
 	add,
-	addi,
 	sub,
-	subi,
 	mul,
 	divi,
 	neg,
@@ -117,12 +115,8 @@ public:
 			return "jal";
 		case add:
 			return "add";
-		case addi:
-			return "addi";
 		case sub:
 			return "sub";
-		case subi:
-			return "subi";
 		case mul:
 			return "mul";
 		case MipsCode::divi:
