@@ -266,10 +266,6 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			if (current->src1->kind == CONSTANT)
 			{
 				appendInstruction(MipsCode::li, t0, to_string(-current->src1->valueoroffset));
-				if (current->des->scope == GLOBAL)
-					appendInstruction(MipsCode::sw, t0, current->des->name);
-				else
-					appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) +"($fp)");
 			}
 			else
 			{
@@ -278,20 +274,16 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 				else
 					appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) +"($fp)");
 				appendInstruction(MipsCode::neg, t0, t1);
-				if (current->des->scope == GLOBAL)
-					appendInstruction(MipsCode::sw, t0, current->des->name);
-				else
-					appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) +"($fp)");
 			}
+			if (current->des->scope == GLOBAL)
+				appendInstruction(MipsCode::sw, t0, current->des->name);
+			else
+				appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) + "($fp)");
 			break;
 		case ASS:
 			if (current->src1->kind == CONSTANT)
 			{
 				appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset));
-				if (current->des->scope == GLOBAL)
-					appendInstruction(MipsCode::sw, t0, current->des->name);
-				else
-					appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) +"($fp)");
 			}
 			else
 			{
@@ -299,11 +291,11 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 					appendInstruction(MipsCode::lw, t0, current->src1->name);
 				else
 					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) +"($fp)");
-				if (current->des->scope == GLOBAL)
-					appendInstruction(MipsCode::sw, t0, current->des->name);
-				else
-					appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) +"($fp)");
 			}
+			if (current->des->scope == GLOBAL)
+				appendInstruction(MipsCode::sw, t0, current->des->name);
+			else
+				appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) + "($fp)");
 			break;
 		case BGT:
 			lss(current, MipsCode::bgt);
