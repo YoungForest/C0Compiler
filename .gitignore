@@ -5,8 +5,8 @@ obj/
 *.layout
 
 # input/output file
-*.txt
-*.c0
+14061213_test.txt
+in.c0
 
 # middle code
 *.mc

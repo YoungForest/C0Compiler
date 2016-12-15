@@ -1,0 +1,24 @@
+int power(int a, int b) {
+    int X, i;
+    X = 1;
+    if(b > 0) {
+        for(i = 0; i < b; i = i + 1) {
+            X = X * a;
+        }
+    }
+    else if(b == 0){;}
+    else{;}
+    return (X);
+}
+
+void main() {
+    int i,a,b,x;
+    i = 3;
+    do {
+        printf("Input 2 Integer:");
+        scanf(a,b);
+        x=power(a,b);
+        printf(x);
+        i = i - 1;
+    } while(i)
+}
