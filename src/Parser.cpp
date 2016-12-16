@@ -136,14 +136,28 @@ void Parser::parser(string fileout)
 			fo << data_global_v[i] << endl;
 		for (int i = 0; i < data_const_string.size(); i++)
 			fo << "yangsen_string" << i << ": .asciiz \"" << data_const_string[i] << "\"" << endl;
-		// print test segament
+		// runtime error message
+        fo << "divi0errorMessage: .asciiz \"Runtime Error: divide by 0.\"" << endl;
+        fo << "arrayOutOfRangeMeaage: .asciiz \"Runtime Error: the index of array is out of range.\"" << endl;
+        // print test segament
 		fo << ".text" << endl;
 		fo << "move $fp, $sp" << endl;
 		fo << "j end" << endl;
-		for (int i = 0; i < mipsInstrGen.finalCodes.size(); i++)
+		fo << "divi0error:" << endl;
+        fo << "li $v0 4" << endl;
+        fo << "la $a0 divi0errorMessage" << endl;
+        fo << "syscall" << endl;
+        fo << "j endOfAll" << endl;
+        fo << "arrayOutOfRange:" << endl;
+        fo << "li $v0 4" << endl;
+        fo << "la $a0 arrayOutOfRangeMeaage" << endl;
+        fo << "syscall" << endl;
+        fo << "j endOfAll" << endl;
+        for (int i = 0; i < mipsInstrGen.finalCodes.size(); i++)
 			fo << mipsInstrGen.finalCodes[i].getInstr() << endl;
 		fo << "end:" << endl;
 		fo << "jal main" << endl;
+        fo << "endOfAll:" << endl;
 	}
 }
 
@@ -1592,7 +1606,11 @@ struct symbolItem* Parser::item()
 		if (mul)
 			middleCode.gen(Opcode::MUL, re, item1, item2);
 		else
+        {
+            if (item2->kind == CONSTANT && item2->valueoroffset == 0)
+                errorGenerate(61);
 			middleCode.gen(Opcode::DIV, re, item1, item2);
+        }
 		item1 = re;
 	}
 	re = item1;

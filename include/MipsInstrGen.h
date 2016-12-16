@@ -5,6 +5,7 @@
 #include <vector>
 #include "QuaterInstr.h"
 #include "Block.h"
+#include "Error.h"
 
 enum MipsCode
 {
@@ -34,7 +35,7 @@ enum MipsCode
 	comment
 };
 
-// useless
+// useless until now
 enum Register
 {
 	$zero,
@@ -160,7 +161,7 @@ public:
 class MipsInstrGen
 {
     public:
-        MipsInstrGen();
+        MipsInstrGen(Error &_error_handle) error_handle(_error_handle) {};
         virtual ~MipsInstrGen();
 		void appendInstruction(std::string label);
 		void appendInstruction(MipsCode _op, std::string _des = "", std::string _src1 = "", std::string _src2 = "");
@@ -172,6 +173,7 @@ class MipsInstrGen
 
 
 		std::vector<Instruction> finalCodes;	// 目标代码缓冲区
+        Error& error_handle;      // 错误处理程序
     protected:
     private:
 };

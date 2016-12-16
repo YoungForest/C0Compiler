@@ -5,14 +5,9 @@
 
 using namespace std;
 
-MipsInstrGen::MipsInstrGen()
-{
-    //ctor
-}
-
 MipsInstrGen::~MipsInstrGen()
 {
-    //dtor
+	//dtor
 }
 
 string MipsInstrGen::to_string(int i)
@@ -77,7 +72,7 @@ void MipsInstrGen::lss(QuaterInstr* current, MipsCode _op)
 		if (current->src2->scope == GLOBAL)
 			appendInstruction(MipsCode::lw, t2, current->src2->name);
 		else
-			appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) +"($fp)");
+			appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) + "($fp)");
 		appendInstruction(_op, t2, to_string(current->src1->valueoroffset), current->label);
 	}
 	else if (current->src1->kind != CONSTANT && current->src2->kind == CONSTANT)
@@ -85,7 +80,7 @@ void MipsInstrGen::lss(QuaterInstr* current, MipsCode _op)
 		if (current->src1->scope == GLOBAL)
 			appendInstruction(MipsCode::lw, t1, current->src1->name);
 		else
-			appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) +"($fp)");
+			appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) + "($fp)");
 		appendInstruction(_op, t1, to_string(current->src2->valueoroffset), current->label);
 	}
 	else
@@ -93,23 +88,24 @@ void MipsInstrGen::lss(QuaterInstr* current, MipsCode _op)
 		if (current->src1->scope == GLOBAL)
 			appendInstruction(MipsCode::lw, t1, current->src1->name);
 		else
-			appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) +"($fp)");
+			appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) + "($fp)");
 		if (current->src2->scope == GLOBAL)
 			appendInstruction(MipsCode::lw, t2, current->src2->name);
 		else
-			appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) +"($fp)");
+			appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) + "($fp)");
 		appendInstruction(_op, t1, t2, current->label);
 	}
 }
 
 void MipsInstrGen::dss(QuaterInstr* current, MipsCode _op)
 {
+	const string divi0 = "divi0errorMessage";
 	string t0 = "$t0";
 	string t1 = "$t1";
 	string t2 = "$t2";
 	if (current->src1->kind == CONSTANT && current->src2->kind == CONSTANT)
 	{
-		switch (_op)	
+		switch (_op)
 		{
 		case MipsCode::add:
 			appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset + current->src2->valueoroffset));
@@ -121,6 +117,11 @@ void MipsInstrGen::dss(QuaterInstr* current, MipsCode _op)
 			appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset * current->src2->valueoroffset));
 			break;
 		case MipsCode::divi:
+			if (current->src2->valueoroffset == 0)
+			{
+				cout << "Divide by constant 0" << endl;	// not accessed
+				exit(0);
+			}
 			appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset / current->src2->valueoroffset));
 			break;
 		default:
@@ -129,18 +130,36 @@ void MipsInstrGen::dss(QuaterInstr* current, MipsCode _op)
 	}
 	else if (current->src1->kind == CONSTANT && current->src2->kind != CONSTANT)
 	{
-		if (current->src2->scope == GLOBAL)
-			appendInstruction(MipsCode::lw, t2, current->src2->name);
+		if (_op != MipsCode::divi)
+		{
+			if (current->src2->scope == GLOBAL)
+				appendInstruction(MipsCode::lw, t2, current->src2->name);
+			else
+				appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) + "($fp)");
+			appendInstruction(_op, t0, t2, to_string(current->src1->valueoroffset));
+		}
 		else
-			appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) +"($fp)");
-		appendInstruction(_op, t0, t2, to_string(current->src1->valueoroffset));
+		{
+			appendInstruction(MipsCode::li, t1, current->src1->valueoroffset);
+			if (current->src2->scope == GLOBAL)
+				appendInstruction(MipsCode::lw, t2, current->src2->name);
+			else
+				appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) + "($fp)");
+			appendInstruction(MipsInstrGen::beqz, divi0, t2)
+			appendInstruction(_op, t0, t1, t2);
+		}
 	}
 	else if (current->src1->kind != CONSTANT && current->src2->kind == CONSTANT)
 	{
 		if (current->src1->scope == GLOBAL)
 			appendInstruction(MipsCode::lw, t1, current->src1->name);
 		else
-			appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) +"($fp)");
+			appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) + "($fp)");
+		if (current->src2->valueoroffset == 0)
+		{
+			cout << "Divide by constant 0" << endl;	// not accessed
+			exit(0);
+		}
 		appendInstruction(_op, t0, t1, to_string(current->src2->valueoroffset));
 	}
 	else
@@ -153,6 +172,7 @@ void MipsInstrGen::dss(QuaterInstr* current, MipsCode _op)
 			appendInstruction(MipsCode::lw, t2, current->src2->name);
 		else
 			appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) + "($fp)");
+		appendInstruction(MipsInstrGen::beqz, divi0, t2)
 		appendInstruction(_op, t0, t1, t2);
 	}
 	// 将des存入内存
@@ -174,7 +194,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 		QuaterInstr* current = (*it);
 
 		// 由四元式生成目标代码
-		switch (current->op)	
+		switch (current->op)
 		{
 		case ADD:
 			dss(current, MipsCode::add);
@@ -182,7 +202,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 		case SUB:
 			dss(current, MipsCode::sub);
 			break;
-		case MUL: 
+		case MUL:
 			dss(current, MipsCode::mul);
 			break;
 		case DIV:
@@ -191,27 +211,27 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 		case LAV:
 			if (current->src1->scope == GLOBAL && current->src2->kind == CONSTANT)
 			{
-				appendInstruction(MipsCode::lw, t0, current->src1->name + "+" +to_string(4 * current->src2->valueoroffset));
+				appendInstruction(MipsCode::lw, t0, current->src1->name + "+" + to_string(4 * current->src2->valueoroffset));
 			}
 			else if (current->src1->scope == GLOBAL && current->src2->kind != CONSTANT)
 			{
 				if (current->src2->scope == GLOBAL)
 					appendInstruction(MipsCode::lw, t1, current->src2->name);
 				else
-					appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) +"($fp)");
+					appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
 				appendInstruction(MipsCode::mul, t1, t1, "4");
 				appendInstruction(MipsCode::lw, t0, current->src1->name + "(" + t1 + ")");
 			}
 			else
 			{
 				if (current->src2->kind == CONSTANT)
-					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset - 4 * current->src2->valueoroffset) +"($fp)");
+					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset - 4 * current->src2->valueoroffset) + "($fp)");
 				else
 				{
 					if (current->src2->scope == GLOBAL)
 						appendInstruction(MipsCode::lw, t1, current->src2->name);
 					else
-						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) +"($fp)");
+						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
 					appendInstruction(MipsCode::mul, t1, t1, "4");
 					appendInstruction(MipsCode::sub, t1, "$fp", t1);
 					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) + "(" + t1 + ")");
@@ -220,7 +240,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			if (current->des->scope == GLOBAL)
 				appendInstruction(MipsCode::sw, t0, current->des->name);
 			else
-				appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) +"($fp)");
+				appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) + "($fp)");
 			break;
 		case SAV:
 			if (current->des->kind == CONSTANT)
@@ -230,7 +250,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 				if (current->des->scope == GLOBAL)
 					appendInstruction(MipsCode::lw, t0, current->des->name);
 				else
-					appendInstruction(MipsCode::lw, t0, to_string(current->des->valueoroffset) +"($fp)");
+					appendInstruction(MipsCode::lw, t0, to_string(current->des->valueoroffset) + "($fp)");
 			}
 			if (current->src1->scope == GLOBAL)
 			{
@@ -241,7 +261,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 					if (current->src2->scope == GLOBAL)
 						appendInstruction(MipsCode::lw, t1, current->src2->name);
 					else
-						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) +"($fp)");
+						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
 					appendInstruction(MipsCode::mul, t1, t1, "4");
 					appendInstruction(MipsCode::sw, t0, current->src1->name + "(" + t1 + ")");
 				}
@@ -249,13 +269,13 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			else
 			{
 				if (current->src2->kind == CONSTANT)
-					appendInstruction(MipsCode::sw, t0, to_string(current->src1->valueoroffset - 4 * current->src2->valueoroffset) +"($fp)");
+					appendInstruction(MipsCode::sw, t0, to_string(current->src1->valueoroffset - 4 * current->src2->valueoroffset) + "($fp)");
 				else
 				{
 					if (current->src2->scope == GLOBAL)
 						appendInstruction(MipsCode::lw, t1, current->src2->name);
 					else
-						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) +"($fp)");
+						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
 					appendInstruction(MipsCode::mul, t1, t1, "4");
 					appendInstruction(MipsCode::sub, t1, "$fp", t1);
 					appendInstruction(MipsCode::sw, t0, to_string(current->src1->valueoroffset) + "(" + t1 + ")");
@@ -272,7 +292,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 				if (current->src1->scope == GLOBAL)
 					appendInstruction(MipsCode::lw, t1, current->src1->name);
 				else
-					appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) +"($fp)");
+					appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) + "($fp)");
 				appendInstruction(MipsCode::neg, t0, t1);
 			}
 			if (current->des->scope == GLOBAL)
@@ -290,7 +310,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 				if (current->src1->scope == GLOBAL)
 					appendInstruction(MipsCode::lw, t0, current->src1->name);
 				else
-					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) +"($fp)");
+					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) + "($fp)");
 			}
 			if (current->des->scope == GLOBAL)
 				appendInstruction(MipsCode::sw, t0, current->des->name);
@@ -326,7 +346,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 				if (current->src1->scope == GLOBAL)
 					appendInstruction(MipsCode::lw, t0, current->src1->name);
 				else
-					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) +"($fp)");
+					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) + "($fp)");
 				appendInstruction(MipsCode::bnez, t0, current->label);
 			}
 			break;
@@ -341,7 +361,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 				if (current->src1->scope == GLOBAL)
 					appendInstruction(MipsCode::lw, t0, current->src1->name);
 				else
-					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) +"($fp)");
+					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) + "($fp)");
 				appendInstruction(MipsCode::beqz, t0, current->label);
 			}
 			break;
@@ -400,7 +420,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 					if (current->des->scope == GLOBAL)
 						appendInstruction(MipsCode::lw, "$v0", current->des->name);
 					else
-						appendInstruction(MipsCode::lw, "$v0", to_string(current->des->valueoroffset) +"($fp)");
+						appendInstruction(MipsCode::lw, "$v0", to_string(current->des->valueoroffset) + "($fp)");
 				}
 			}
 			appendInstruction(MipsCode::lw, "$v1", "-8($fp)");
@@ -444,7 +464,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 				if (current->des->scope == GLOBAL)
 					appendInstruction(MipsCode::sw, "$v0", current->des->name);
 				else
-					appendInstruction(MipsCode::sw, "$v0", to_string(current->des->valueoroffset) +"($fp)");
+					appendInstruction(MipsCode::sw, "$v0", to_string(current->des->valueoroffset) + "($fp)");
 			}
 			else
 			{
@@ -453,7 +473,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 				if (current->des->scope == GLOBAL)
 					appendInstruction(MipsCode::sw, "$v0", current->des->name);
 				else
-					appendInstruction(MipsCode::sw, "$v0", to_string(current->des->valueoroffset) +"($fp)");
+					appendInstruction(MipsCode::sw, "$v0", to_string(current->des->valueoroffset) + "($fp)");
 			}
 			break;
 		case WRITE:
@@ -513,7 +533,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			appendInstruction(MipsCode::sw, t0, to_string(current->src1->valueoroffset) + "($sp)");
 			break;
 		case PUT:
-			appendInstruction(MipsCode::sw, "$v0", to_string(current->des->valueoroffset) +"($fp)");
+			appendInstruction(MipsCode::sw, "$v0", to_string(current->des->valueoroffset) + "($fp)");
 			break;
 		default:
 			break;

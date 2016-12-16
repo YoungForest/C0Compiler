@@ -11,7 +11,7 @@
 class Parser
 {
     public:
-        Parser(std::string filein) : laxer(filein, error_handler), globalTable(GLOBAL), localTable(LOCAL) {};
+        Parser(std::string filein) : mipsInstrGen(error_handler), laxer(filein, error_handler), globalTable(GLOBAL), localTable(LOCAL) {};
         virtual ~Parser();
 
         void parser(std::string fileout);

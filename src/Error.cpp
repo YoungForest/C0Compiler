@@ -61,16 +61,11 @@ void Error::errorMessage(int errortype,int line, int column) {
 	case 56: Message << "expected a printf" << endl; break;
 	case 58: Message << "expected a return" << endl; break;
 	case 60: Message << "expected a identifier or interger or charactor or function call or '(' here" << endl; break;
+    case 61: Message << "Divide by constant 0" << endl; break;
     default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
     }
     error_messages.push_back(Message.str());
-	printWarnings();
-	printErrors();
-#ifdef CB
-	system("pause");
-#endif // CB
-	exit(0);
 #ifdef _ERROR_FATAL
 	printWarnings();
 	printErrors();
