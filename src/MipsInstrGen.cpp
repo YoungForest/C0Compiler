@@ -17,6 +17,32 @@ string MipsInstrGen::to_string(int i)
 	string s = ss.str();
 	return s;
 }
+
+MipsCode branchNeg(MipsCode::_op)
+{
+	switch (_op)
+	{
+	case bgt:
+		return MipsCode::ble;
+	case bge:
+		return MipsCode::blt;
+	case blt:
+		return MipsCode::bge;
+	case ble:
+		return MipsCode::bgt;
+	case beq:
+		return MipsCode::bne;
+	case bne:
+		return MipsCode::beq;
+	case bnez:
+		return MipsCode::beqz;
+	case beqz:
+		return MipsCode::bnez;
+	default:
+		cout << "wrong use of branchNeg!" << endl;
+		exit(0);
+	}
+}
 // 专门为 set label
 void MipsInstrGen::appendInstruction(string label)
 {
@@ -30,7 +56,7 @@ void MipsInstrGen::appendInstruction(MipsCode _op, std::string _des, std::string
 	finalCodes.push_back(newone);
 }
 
-void MipsInstrGen::lss(QuaterInstr* current, MipsCode _op)
+void MipsInstrGen::lss(QuaterInstr * current, MipsCode _op)
 {
 	string t0 = "$t0";
 	string t1 = "$t1";
@@ -73,7 +99,7 @@ void MipsInstrGen::lss(QuaterInstr* current, MipsCode _op)
 			appendInstruction(MipsCode::lw, t2, current->src2->name);
 		else
 			appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) + "($fp)");
-		appendInstruction(_op, t2, to_string(current->src1->valueoroffset), current->label);
+		appendInstruction(branchNeg(_op), t2, to_string(current->src1->valueoroffset), current->label);
 	}
 	else if (current->src1->kind != CONSTANT && current->src2->kind == CONSTANT)
 	{
@@ -97,7 +123,7 @@ void MipsInstrGen::lss(QuaterInstr* current, MipsCode _op)
 	}
 }
 
-void MipsInstrGen::dss(QuaterInstr* current, MipsCode _op)
+void MipsInstrGen::dss(QuaterInstr * current, MipsCode _op)
 {
 	const string divi0 = "divi0errorMessage";
 	string t0 = "$t0";
@@ -185,6 +211,7 @@ void MipsInstrGen::dss(QuaterInstr* current, MipsCode _op)
 void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 {
 	vector<QuaterInstr*>::iterator it = middleCodes.begin();
+	const string arrayOutOfRange = "arrayOutOfRangeMeaage";
 	// 所使用的3个寄存器
 	string t0 = "$t0";
 	string t1 = "$t1";
@@ -211,6 +238,11 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 		case LAV:
 			if (current->src1->scope == GLOBAL && current->src2->kind == CONSTANT)
 			{
+				if (current->src2->valueoroffset < 0 || current->src2->valueoroffset >= current->src1->length)
+				{
+					cout << "Index of array is out of range" << endl;	// not accessable
+					exit(0);
+				}
 				appendInstruction(MipsCode::lw, t0, current->src1->name + "+" + to_string(4 * current->src2->valueoroffset));
 			}
 			else if (current->src1->scope == GLOBAL && current->src2->kind != CONSTANT)
@@ -219,19 +251,32 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 					appendInstruction(MipsCode::lw, t1, current->src2->name);
 				else
 					appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
+				// 数组越界处理
+				appendInstruction(MipsCode::blt, t1, "0", arrayOutOfRange);
+				appendInstruction(MipsCode::bge, t1, to_string(current->src1->length), arrayOutOfRange);
 				appendInstruction(MipsCode::mul, t1, t1, "4");
 				appendInstruction(MipsCode::lw, t0, current->src1->name + "(" + t1 + ")");
 			}
 			else
 			{
 				if (current->src2->kind == CONSTANT)
+				{
+					if (current->src2->valueoroffset < 0 || current->src2->valueoroffset >= current->src1->length)
+					{
+						cout << "Index of array is out of range" << endl;	// not accessable
+						exit(0);
+					}
 					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset - 4 * current->src2->valueoroffset) + "($fp)");
+				}
 				else
 				{
 					if (current->src2->scope == GLOBAL)
 						appendInstruction(MipsCode::lw, t1, current->src2->name);
 					else
 						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
+					// 数组越界处理
+					appendInstruction(MipsCode::blt, t1, "0", arrayOutOfRange);
+					appendInstruction(MipsCode::bge, t1, to_string(current->src1->length), arrayOutOfRange);
 					appendInstruction(MipsCode::mul, t1, t1, "4");
 					appendInstruction(MipsCode::sub, t1, "$fp", t1);
 					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) + "(" + t1 + ")");
@@ -244,7 +289,9 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			break;
 		case SAV:
 			if (current->des->kind == CONSTANT)
+			{
 				appendInstruction(MipsCode::li, t0, to_string(current->des->valueoroffset));
+			}
 			else
 			{
 				if (current->des->scope == GLOBAL)
@@ -255,13 +302,23 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			if (current->src1->scope == GLOBAL)
 			{
 				if (current->src2->kind == CONSTANT)
+				{
+					if (current->src2->valueoroffset < 0 || current->src2->valueoroffset >= current->src1->length)
+					{
+						cout << "Index of array is out of range" << endl;	// not accessable
+						exit(0);
+					}
 					appendInstruction(MipsCode::sw, t0, current->src1->name + "+" + to_string(4 * current->src2->valueoroffset));
+				}
 				else
 				{
 					if (current->src2->scope == GLOBAL)
 						appendInstruction(MipsCode::lw, t1, current->src2->name);
 					else
 						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
+					// 数组越界处理
+					appendInstruction(MipsCode::blt, t1, "0", arrayOutOfRange);
+					appendInstruction(MipsCode::bge, t1, to_string(current->src1->length), arrayOutOfRange);
 					appendInstruction(MipsCode::mul, t1, t1, "4");
 					appendInstruction(MipsCode::sw, t0, current->src1->name + "(" + t1 + ")");
 				}
@@ -269,13 +326,23 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			else
 			{
 				if (current->src2->kind == CONSTANT)
+				{
+					if (current->src2->valueoroffset < 0 || current->src2->valueoroffset >= current->src1->length)
+					{
+						cout << "Index of array is out of range" << endl;	// not accessable
+						exit(0);
+					}
 					appendInstruction(MipsCode::sw, t0, to_string(current->src1->valueoroffset - 4 * current->src2->valueoroffset) + "($fp)");
+				}
 				else
 				{
 					if (current->src2->scope == GLOBAL)
 						appendInstruction(MipsCode::lw, t1, current->src2->name);
 					else
 						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
+					// 数组越界处理
+					appendInstruction(MipsCode::blt, t1, "0", arrayOutOfRange);
+					appendInstruction(MipsCode::bge, t1, to_string(current->src1->length), arrayOutOfRange);
 					appendInstruction(MipsCode::mul, t1, t1, "4");
 					appendInstruction(MipsCode::sub, t1, "$fp", t1);
 					appendInstruction(MipsCode::sw, t0, to_string(current->src1->valueoroffset) + "(" + t1 + ")");

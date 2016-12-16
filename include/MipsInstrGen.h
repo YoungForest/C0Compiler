@@ -163,7 +163,8 @@ class MipsInstrGen
     public:
         MipsInstrGen(Error &_error_handle) error_handle(_error_handle) {};
         virtual ~MipsInstrGen();
-		void appendInstruction(std::string label);
+		MipsCode branchNeg(MipsCode::_op);	// 分支指令取反
+		void appendInstruction(std::string label);	// 生成final code
 		void appendInstruction(MipsCode _op, std::string _des = "", std::string _src1 = "", std::string _src2 = "");
 		void generateInstruction(std::vector<Block *> &blocks);	// 以基本块为单位生成目标代码
 		void generateInstruction(std::vector<QuaterInstr*>& middleCodes);	// 根据中间代码生成目标代码
