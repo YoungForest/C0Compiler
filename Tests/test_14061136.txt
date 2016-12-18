@@ -1,80 +1,101 @@
-const int cona = 1, conb = 2;       
-const int conc = 3, cong = 4;        
-const int conh = 5, coni = 6, conj = 7;        
-int a[10];        
+const int cona = 1, conb = 2;
+const int conc = 3, cong = 4;
+const int conh = 5, coni = 6, conj = 7;
+int a[10];
 int c;
-void emptyfunc(){}    
-void emptyfunc2(){;}    
-char testchar(){     
+void emptyfunc() {}
+void emptyfunc2() {;}
+char testchar() {
     return ('0');
 }
-int fibonacci (int n){    
-    const int cona = -1;    
+int fibonacci (int n) {
+    const int cona = -1;
     char testc;
-    if(n==1) return (1);    
-    if(n!=2) return (+fibonacci(n+-1)+fibonacci(n-2)+0); 
+    if (n == 1) return (1);
+    if (n != 2) return (+fibonacci(n + -1) + fibonacci(n - 2) + 0);
 }
-void move(char a, char b){        
-    const int testcon1 = 1;        
+void move(char a, char b) {
+    const int testcon1 = 1;
     const char testcon2 = '1';
-    printf('M');    
+    printf('M');
     printf("OVE ");
     printf(a);
-    printf(" TO ",b);
+    printf(" TO ", b);
     printf(" ");
-} 
-void hanoi(int hanoii, char l, char m, char r){    
-    if(2>hanoii) {
-        move(l,r);
-        return;
-        printf("RETURN ERROR"); 
-    }
-    hanoi(hanoii-1, l, r, m);     
-    move(l,r);        
-    hanoi(hanoii-1, m, l, r);
 }
-int getpower (int n, int le){
-    int move;        
-    if(le>=2){    
-        move = getpower(n,le-1);
-        a[le-1] = move;    
-        return (n*move);
+void hanoi(int hanoii, char l, char m, char r) {
+    if (2 > hanoii) {
+        move(l, r);
+        return;
+        printf("RETURN ERROR");
     }
-    if(1<=le){
+    hanoi(hanoii - 1, l, r, m);
+    move(l, r);
+    hanoi(hanoii - 1, m, l, r);
+}
+int getpower (int n, int le) {
+    int move;
+    printf(le);
+    if (le >= 2) {
+        move = getpower(n, le - 1);
+        a[le - 1] = move;
+        return (n * move);
+    }
+    if (1 <= le) {
         a[le] = n;
+        printf("n: ", n);
         return (n);
     }
+    printf("ERROR");
 }
-int getsqr(int n){
+int getsqr(int n) {
     int _i;
     _i = 1;
-    do _i = +1 + _i; while(_i < n / _i); 
-    if(-n+_i*_i < n-(-1+_i)*(_i-1)) return (_i);    
-    return (_i-1);
+    do _i = +1 + _i; while (_i < n / _i);
+    if (-n + _i * _i < n - (-1 + _i) * (_i - 1)) return (_i);
+    return (_i - 1);
 }
-void main(){
-    const char cond = 'A', cone = 'B', conf = 'C';    
-    const char con1 = '+', con2 = '-';    
+void main() {
+    const char cond = 'A', cone = 'B', conf = 'C';
+    const char con1 = '+', con2 = '-';
     const char con3 = '*';
-    const char Con3 = '/';    
-    const int testcon = 100;    
-    int c;    
-    int num,i;        
-    int fib,testaj[10],sqr;    
-    int testai[100],a,a_,a_a,a0,a00;    
-    int testai1,testai2,testai3,testai4,testai5,testai6;
+    const char Con3 = '/';
+    const int testcon = 100;
+    int c;
+    int num, i;
+    int fib, testaj[10], sqr;
+    int testai[100], aa, a_, a_a, a0, a00;
+    int testai1, testai2, testai3, testai4, testai5, testai6;
 
-    char c1;  
-    char c2,c3;    
-    char c4,c5,c6;        
-    
-    a = 12345678912;
-    a_ = cond; 
-    testai[0] = +5;    
-    testai[testai[0]] = 1; 
-    testai[con1] = 2;    
-    scanf(c,num);    
-    
+    char c1;
+    char c2, c3;
+    char c4, c5, c6;
+
+    aa = 12345678912;
+    a_ = cond;
+    testai[0] = +5;
+    testai[testai[0]] = 1;
+    testai[con1] = 2;
+    scanf(c, num);
+    a[0] = 1;
+    if (c == 1)
+    {
+        getpower(num, 10);
+        i = 0;
+        do
+            if (i < 10)
+            {
+                printf("NO", i + 1);
+                printf(":", a[i]);
+                printf(" ");
+                printf("");
+                if (1)
+                    i = i + 1;
+            }
+        while (i < 10);
+    }
+    if (c == +2)
+        hanoi(num, cond, cone, conf);
     return;
 }
 

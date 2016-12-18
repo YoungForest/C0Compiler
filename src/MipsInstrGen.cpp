@@ -1,6 +1,6 @@
 #include "MipsInstrGen.h"
 #include "SymbolTable.h"
-
+#include <iostream>
 #include <sstream>
 
 using namespace std;
@@ -18,26 +18,22 @@ string MipsInstrGen::to_string(int i)
 	return s;
 }
 
-MipsCode branchNeg(MipsCode::_op)
+MipsCode MipsInstrGen::branchNeg(MipsCode _op)
 {
 	switch (_op)
 	{
 	case bgt:
-		return MipsCode::ble;
-	case bge:
 		return MipsCode::blt;
+	case bge:
+		return MipsCode::ble;
 	case blt:
-		return MipsCode::bge;
-	case ble:
 		return MipsCode::bgt;
+	case ble:
+		return MipsCode::bge;
 	case beq:
-		return MipsCode::bne;
-	case bne:
 		return MipsCode::beq;
-	case bnez:
-		return MipsCode::beqz;
-	case beqz:
-		return MipsCode::bnez;
+	case bne:
+		return MipsCode::bne;
 	default:
 		cout << "wrong use of branchNeg!" << endl;
 		exit(0);
@@ -145,7 +141,7 @@ void MipsInstrGen::dss(QuaterInstr * current, MipsCode _op)
 		case MipsCode::divi:
 			if (current->src2->valueoroffset == 0)
 			{
-				cout << "Divide by constant 0" << endl;	// not accessed
+				cout << "label1: Divide by constant 0" << endl;	// not accessed
 				exit(0);
 			}
 			appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset / current->src2->valueoroffset));
@@ -166,12 +162,12 @@ void MipsInstrGen::dss(QuaterInstr * current, MipsCode _op)
 		}
 		else
 		{
-			appendInstruction(MipsCode::li, t1, current->src1->valueoroffset);
+			appendInstruction(MipsCode::li, t1, to_string(current->src1->valueoroffset));
 			if (current->src2->scope == GLOBAL)
 				appendInstruction(MipsCode::lw, t2, current->src2->name);
 			else
 				appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) + "($fp)");
-			appendInstruction(MipsInstrGen::beqz, divi0, t2)
+			appendInstruction(MipsCode::beqz, t2, divi0);
 			appendInstruction(_op, t0, t1, t2);
 		}
 	}
@@ -181,9 +177,9 @@ void MipsInstrGen::dss(QuaterInstr * current, MipsCode _op)
 			appendInstruction(MipsCode::lw, t1, current->src1->name);
 		else
 			appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) + "($fp)");
-		if (current->src2->valueoroffset == 0)
+		if (current->op == MipsCode::divi && current->src2->valueoroffset == 0)
 		{
-			cout << "Divide by constant 0" << endl;	// not accessed
+			cout << "label2: Divide by constant 0" << endl;	// not accessed
 			exit(0);
 		}
 		appendInstruction(_op, t0, t1, to_string(current->src2->valueoroffset));
@@ -198,7 +194,8 @@ void MipsInstrGen::dss(QuaterInstr * current, MipsCode _op)
 			appendInstruction(MipsCode::lw, t2, current->src2->name);
 		else
 			appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) + "($fp)");
-		appendInstruction(MipsInstrGen::beqz, divi0, t2)
+		if (current->op == MipsCode::divi)
+			appendInstruction(MipsCode::beqz, t2, divi0);
 		appendInstruction(_op, t0, t1, t2);
 	}
 	// ½«des´æÈëÄÚ´æ
