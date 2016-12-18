@@ -81,6 +81,7 @@ struct symbolItem* Parser::test(string ident)
 		if (re == NULL)
 		{
 			errorGenerate(103, ident);
+			re = globalTable.insertItem(ident, laxer.linenum, VARIABLE, INT_TYPE, 0, laxer.num);
 		}
 	}
     return re;
@@ -1549,7 +1550,7 @@ struct symbolItem* Parser::factor()
 				else
 				{
 					errorGenerate(108, f->name);
-					return NULL;
+					return localTable.generateTempConstant(108, INT_TYPE);
 				}
 			}
 			else
