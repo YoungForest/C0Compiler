@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 
-#define _ERROR_FATAL
+//#define _ERROR_FATAL
 
 using namespace std;
 
@@ -62,7 +62,8 @@ void Error::errorMessage(int errortype,int line, int column) {
 	case 58: Message << "expected a return" << endl; break;
 	case 60: Message << "expected a identifier or interger or charactor or function call or '(' here" << endl; break;
     case 61: Message << "Divide by constant 0" << endl; break;
-    default: Message << "Unhandled error " << errortype << " !" << endl;
+	case 63: Message << "need array before '['" << endl; break;
+	default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
     }
     error_messages.push_back(Message.str());
@@ -74,6 +75,12 @@ void Error::errorMessage(int errortype,int line, int column) {
 #endif // CB
 	exit(0);
 #endif
+	if (errortype % 2 == 0) 
+	{
+		printWarnings();
+		printErrors();
+		exit(0);
+	}
 }
 
 void Error::errorMessage(int errortype, int line, int column, string message1) {
@@ -85,13 +92,13 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
 	case 1: Message << message1 << endl; break;
     case 102: Message << "Can't recongnize this token " << message1 << endl; break;
 	case 103: Message << "Undefined identifier : " << message1 << " !" << endl; break;
-	case 116: Message << "Undefined function : " << message1 << " !" << endl; break;
 	case 104: Message << message1 << " parameters needed while more are given !" << endl; break;
 	case 106: Message <<  message1 << " parameters needed while fewer are given !" << endl; break;
 	case 108: Message << message1 << " is a void function while not a return function, which can not using in a expression!" << endl; break;
 	case 110: Message << "a function needed before '(', while " << message1 << " are given! " << endl; break;
 	case 112: Message << message1 << " at the left of = is not assignable!" << endl; break;
 	case 114: Message << "function parameter has the same name with function " << message1 << endl; break;
+	case 116: Message << "undefined function name " << message1 << endl;
 	default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
     }

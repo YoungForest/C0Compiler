@@ -1520,8 +1520,10 @@ struct symbolItem* Parser::factor()
 		string ident = laxer.getToken();
 		f = test(ident);
 		laxer.getsym();
-		if (laxer.sym == LSQUARE && f->length > 0)
+		if (laxer.sym == LSQUARE)
 		{
+			if (f->length <= 0)
+				errorGenerate(63);
 			laxer.getsym();
 			struct symbolItem* item1 = expression();
 			if (laxer.sym == RSQUARE)
@@ -1530,6 +1532,10 @@ struct symbolItem* Parser::factor()
 				struct symbolItem* re = localTable.generateTemp();
 				middleCode.gen(Opcode::LAV, re, f, item1);
 				return re;
+			}
+			else
+			{
+				errorGenerate(24);
 			}
 		}
 		else if (laxer.sym == LPARENT)
