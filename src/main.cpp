@@ -9,7 +9,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 #ifdef DEBUG
-	freopen("C:/Users/young/Desktop/middleCode.mc", "w", stdout);
+	//freopen("C:/Users/young/Desktop/middleCode.mc", "w", stdout);
 #endif // DEBUG
 
 	if (argc != 3)
@@ -17,9 +17,10 @@ int main(int argc, char *argv[])
 		printf("Too few or many arguments.\n");
 		exit(1);
 	}
-#ifdef DEBUG
-	cout << "debuging   " << __LINE__ << "  " << __FILE__ << endl;
-#endif
+#ifdef VS
+	// print date and time, make it easier to debug
+	cout << "# generate time: " << __TIME__ << " " << __DATE__;
+#endif // VS
 
 #ifdef CB
 	// cout << "test CB" << endl;

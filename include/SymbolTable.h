@@ -42,7 +42,7 @@ class SymbolTable
 #define CONSTANT 1
 #define VARIABLE 2
 #define FUNCTION 3
-#define PARAMETER 4
+#define PARAMETER 4	// 注意 参数很多时候和变量作用相同
 
 // 符号数据类型 type
 #define INT_TYPE INT

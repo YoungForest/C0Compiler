@@ -178,7 +178,7 @@ void MipsInstrGen::dss(QuaterInstr * current, MipsCode _op)
 			appendInstruction(MipsCode::lw, t1, current->src1->name);
 		else
 			appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) + "($fp)");
-		if (current->op == MipsCode::divi && current->src2->valueoroffset == 0)
+		if (_op == MipsCode::divi && current->src2->valueoroffset == 0)
 		{
 			cout << "label2: Divide by constant 0" << endl;	// not accessed
 			exit(0);
@@ -195,7 +195,7 @@ void MipsInstrGen::dss(QuaterInstr * current, MipsCode _op)
 			appendInstruction(MipsCode::lw, t2, current->src2->name);
 		else
 			appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) + "($fp)");
-		if (current->op == MipsCode::divi)
+		if (_op == MipsCode::divi)
 			appendInstruction(MipsCode::beqz, t2, divi0);
 		appendInstruction(_op, t0, t1, t2);
 	}

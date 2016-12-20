@@ -1274,7 +1274,10 @@ void Parser::valueParameterTable(struct symbolItem* func)
 	functionIn("valueParameterTable");
 	if (laxer.sym == RPARENT)
 	{
-
+		if (func->length > 0)
+		{
+			errorGenerate(106, to_string(func->length));
+		}
 	}
 	else
 	{
@@ -1292,7 +1295,6 @@ void Parser::valueParameterTable(struct symbolItem* func)
 				if (count > func->length)
 				{
 					errorGenerate(104, to_string(func->length));	//error
-					break;
 				}
 				laxer.getsym();
 				re = expression();
@@ -1550,6 +1552,7 @@ struct symbolItem* Parser::factor()
 				else
 				{
 					errorGenerate(108, f->name);
+					callFunction(ident);
 					return localTable.generateTempConstant(108, INT_TYPE);
 				}
 			}
