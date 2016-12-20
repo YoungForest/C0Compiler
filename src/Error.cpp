@@ -63,6 +63,9 @@ void Error::errorMessage(int errortype,int line, int column) {
 	case 60: Message << "expected a identifier or interger or charactor or function call or '(' here" << endl; break;
     case 61: Message << "Divide by constant 0" << endl; break;
 	case 62: Message << "expected a '[' here" << endl; break;
+	case 63: Message << "void function return something" << endl; break;
+	case 65: Message << "char or int function return nothing" << endl; break;
+
 	default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
     }

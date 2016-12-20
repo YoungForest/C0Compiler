@@ -236,9 +236,10 @@ void Parser::program()
 void Parser::defineVoidFunction()
 {
 	functionIn("defineVoidFunction");
+	returnFlag = false;
 	string ident;
 	int length = 0;
-	if (laxer.sym == IDENTIFIER)
+	if (laxer.sym == IDENTIFIER)	// have to be true
 	{
 		ident = laxer.getToken();
 		laxer.getsym();
@@ -298,6 +299,7 @@ void Parser::defineVoidFunction()
 // <有返回值函数定义>  ::= '(' <参数表>‘)’ ‘{’<复合语句>‘}’
 void Parser::defineReturnFunction(int type, string ident)
 {
+	returnFlag = true;
 	int length = 0;
 	functionIn("defineReturnFunction");
 
@@ -587,6 +589,7 @@ int Parser::parameterTable(string functionName)
 void Parser::mainFunction()
 {
 	functionIn("mainFunction");
+	returnFlag = false;
 	if (laxer.sym == MAIN)
 	{
 		struct symbolItem *main = new symbolItem();
@@ -1443,6 +1446,8 @@ void Parser::returnStatement()
 		laxer.getsym();
 		if (laxer.sym == LPARENT)
 		{
+			if (!returnFlag)
+				errorGenerate(63);
 			laxer.getsym();
 			struct symbolItem* returnValue = expression();
 			if (laxer.sym == RPARENT)
@@ -1457,6 +1462,8 @@ void Parser::returnStatement()
 		}
 		else
 		{
+			if (returnFlag)
+				errorGenerate(65);
 			middleCode.gen(Opcode::RET);
 		}
 		parserTestPrint("return statement");

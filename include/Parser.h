@@ -83,6 +83,7 @@ class Parser
 		std::vector<std::string> data_const_string;
 		std::vector<std::string> data_global_v;
 		std::vector<Instruction> finalCodes;
+		bool returnFlag;	// ture => char or int; false => void
 };
 
 #endif // PARSER_H
