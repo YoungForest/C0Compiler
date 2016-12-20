@@ -36,7 +36,7 @@ class SymbolTable
 		int scope;
 };
 
-#define BASE_OFFSET 108
+#define BASE_OFFSET 40	// 参数区开始偏移
 // 符号表
 // 符号类型 kind
 #define CONSTANT 1

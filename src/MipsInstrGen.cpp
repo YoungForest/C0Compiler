@@ -18,29 +18,29 @@ string MipsInstrGen::to_string(int i)
 	string s = ss.str();
 	return s;
 }
-
+// get the negition of a branch mips code;
 MipsCode MipsInstrGen::branchNeg(MipsCode _op)
 {
 	switch (_op)
 	{
 	case bgt:
-		return MipsCode::blt;
+		return MipsCode::blt;	// > -> <
 	case bge:
-		return MipsCode::ble;
+		return MipsCode::ble;	// >= -> <=
 	case blt:
-		return MipsCode::bgt;
+		return MipsCode::bgt;	// < -> >
 	case ble:
-		return MipsCode::bge;
+		return MipsCode::bge;	// <= -> >=
 	case beq:
-		return MipsCode::beq;
+		return MipsCode::beq;	// = -> =
 	case bne:
-		return MipsCode::bne;
+		return MipsCode::bne;	// != -> !=
 	default:
-		cout << "wrong use of branchNeg!" << endl;
+		cout << "wrong use of branchNeg!" << endl;	// unaccessable if everything go right
 		exit(0);
 	}
 }
-// 专门为 set label
+// 专门为 set label, 虽然之后发现可以不要
 void MipsInstrGen::appendInstruction(string label)
 {
 	Instruction newone(label);
@@ -444,35 +444,18 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			appendInstruction(MipsCode::sw, "$ra", "0($sp)");
 			appendInstruction(MipsCode::sw, "$fp", "-4($sp)");
 			appendInstruction(MipsCode::move, "$fp", "$sp");
-			appendInstruction(MipsCode::sw, "$v1", "-8($sp)");
-			appendInstruction(MipsCode::sw, "$a0", "-12($sp)");
-			appendInstruction(MipsCode::sw, "$a1", "-16($sp)");
-			appendInstruction(MipsCode::sw, "$a2", "-20($sp)");
-			appendInstruction(MipsCode::sw, "$a3", "-24($sp)");
-			appendInstruction(MipsCode::sw, "$t0", "-28($sp)");
-			appendInstruction(MipsCode::sw, "$t1", "-32($sp)");
-			appendInstruction(MipsCode::sw, "$t2", "-36($sp)");
-			appendInstruction(MipsCode::sw, "$t3", "-40($sp)");
-			appendInstruction(MipsCode::sw, "$t4", "-44($sp)");
-			appendInstruction(MipsCode::sw, "$t5", "-48($sp)");
-			appendInstruction(MipsCode::sw, "$t6", "-52($sp)");
-			appendInstruction(MipsCode::sw, "$t7", "-56($sp)");
-			appendInstruction(MipsCode::sw, "$s0", "-60($sp)");
-			appendInstruction(MipsCode::sw, "$s1", "-64($sp)");
-			appendInstruction(MipsCode::sw, "$s2", "-68($sp)");
-			appendInstruction(MipsCode::sw, "$s3", "-72($sp)");
-			appendInstruction(MipsCode::sw, "$s4", "-76($sp)");
-			appendInstruction(MipsCode::sw, "$s5", "-80($sp)");
-			appendInstruction(MipsCode::sw, "$s6", "-84($sp)");
-			appendInstruction(MipsCode::sw, "$s7", "-88($sp)");
-			appendInstruction(MipsCode::sw, "$t8", "-92($sp)");
-			appendInstruction(MipsCode::sw, "$t9", "-96($sp)");
-			appendInstruction(MipsCode::sw, "$k0", "-100($sp)");
-			appendInstruction(MipsCode::sw, "$k1", "-104($sp)");
+			appendInstruction(MipsCode::sw, "$s0", "-8($sp)");
+			appendInstruction(MipsCode::sw, "$s1", "-12($sp)");
+			appendInstruction(MipsCode::sw, "$s2", "-16($sp)");
+			appendInstruction(MipsCode::sw, "$s3", "-20($sp)");
+			appendInstruction(MipsCode::sw, "$s4", "-24($sp)");
+			appendInstruction(MipsCode::sw, "$s5", "-28($sp)");
+			appendInstruction(MipsCode::sw, "$s6", "-32($sp)");
+			appendInstruction(MipsCode::sw, "$s7", "-36($sp)");
 			appendInstruction(MipsCode::sub, "$sp", "$sp", to_string(BASE_OFFSET));
 			break;
 		case RET:
-			if (current->des == NULL)
+			if (current->des == NULL)	// 无返回值
 			{
 				appendInstruction(MipsCode::li, "$v0", "0");
 			}
@@ -488,31 +471,14 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 						appendInstruction(MipsCode::lw, "$v0", to_string(current->des->valueoroffset) + "($fp)");
 				}
 			}
-			appendInstruction(MipsCode::lw, "$v1", "-8($fp)");
-			appendInstruction(MipsCode::lw, "$a0", "-12($fp)");
-			appendInstruction(MipsCode::lw, "$a1", "-16($fp)");
-			appendInstruction(MipsCode::lw, "$a2", "-20($fp)");
-			appendInstruction(MipsCode::lw, "$a3", "-24($fp)");
-			appendInstruction(MipsCode::lw, "$t0", "-28($fp)");
-			appendInstruction(MipsCode::lw, "$t1", "-32($fp)");
-			appendInstruction(MipsCode::lw, "$t2", "-36($fp)");
-			appendInstruction(MipsCode::lw, "$t3", "-40($fp)");
-			appendInstruction(MipsCode::lw, "$t4", "-44($fp)");
-			appendInstruction(MipsCode::lw, "$t5", "-48($fp)");
-			appendInstruction(MipsCode::lw, "$t6", "-52($fp)");
-			appendInstruction(MipsCode::lw, "$t7", "-56($fp)");
-			appendInstruction(MipsCode::lw, "$s0", "-60($fp)");
-			appendInstruction(MipsCode::lw, "$s1", "-64($fp)");
-			appendInstruction(MipsCode::lw, "$s2", "-68($fp)");
-			appendInstruction(MipsCode::lw, "$s3", "-72($fp)");
-			appendInstruction(MipsCode::lw, "$s4", "-76($fp)");
-			appendInstruction(MipsCode::lw, "$s5", "-80($fp)");
-			appendInstruction(MipsCode::lw, "$s6", "-84($fp)");
-			appendInstruction(MipsCode::lw, "$s7", "-88($fp)");
-			appendInstruction(MipsCode::lw, "$t8", "-92($fp)");
-			appendInstruction(MipsCode::lw, "$t9", "-96($fp)");
-			appendInstruction(MipsCode::lw, "$k0", "-100($fp)");
-			appendInstruction(MipsCode::lw, "$k1", "-104($fp)");
+			appendInstruction(MipsCode::lw, "$s0", "-8($fp)");
+			appendInstruction(MipsCode::lw, "$s1", "-12($fp)");
+			appendInstruction(MipsCode::lw, "$s2", "-16($fp)");
+			appendInstruction(MipsCode::lw, "$s3", "-20($fp)");
+			appendInstruction(MipsCode::lw, "$s4", "-24($fp)");
+			appendInstruction(MipsCode::lw, "$s5", "-28($fp)");
+			appendInstruction(MipsCode::lw, "$s6", "-32($fp)");
+			appendInstruction(MipsCode::lw, "$s7", "-36($fp)");
 			appendInstruction(MipsCode::lw, "$ra", "0($fp)");
 			appendInstruction(MipsCode::move, "$sp", "$fp");
 			appendInstruction(MipsCode::lw, "$fp", "-4($fp)");
@@ -531,7 +497,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 				else
 					appendInstruction(MipsCode::sw, "$v0", to_string(current->des->valueoroffset) + "($fp)");
 			}
-			else
+			else if (current->des->type == CHAR_TYPE)
 			{
 				appendInstruction(MipsCode::li, "$v0", "12");
 				appendInstruction(MipsCode::syscall);
@@ -539,6 +505,10 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 					appendInstruction(MipsCode::sw, "$v0", current->des->name);
 				else
 					appendInstruction(MipsCode::sw, "$v0", to_string(current->des->valueoroffset) + "($fp)");
+			}
+			else
+			{
+				cout << "READ ERROR CHECK SOURCE!" << endl;
 			}
 			break;
 		case WRITE:
