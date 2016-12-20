@@ -6,34 +6,7 @@
 #include "QuaterInstr.h"
 #include "Block.h"
 #include "Error.h"
-
-enum MipsCode
-{
-	la,
-	lw,
-	sw,
-	sb,
-	add,
-	sub,
-	mul,
-	divi,
-	neg,
-	jal,
-	j,
-	jr,
-	beq,
-	bne,
-	bge,
-	bgt,
-	ble,
-	blt,
-	bnez,
-	beqz,
-	move,
-	li,
-	syscall,
-	comment
-};
+#include "Instruction.h"
 
 // useless until now
 enum Register
@@ -78,86 +51,7 @@ enum Register
 
 	$ra,
 };
-class Instruction
-{
-public:
-	std::string op;
-	std::string des;	// 因为 有可能是变量, 标签, 或 寄存器
-	std::string src1;
-	std::string src2;
 
-	Instruction(std::string label)
-	{
-		op = label + ":";
-		des = "";
-		src1 = "";
-		src2 = "";
-	}
-	Instruction(MipsCode _op, std::string _des = "", std::string _src1 = "", std::string _src2 = "") {
-		op = getOpName(_op);
-		des = _des;
-		src1 = _src1;
-		src2 = _src2;
-	}
-	std::string getOpName(MipsCode _opcode) {
-		switch (_opcode)
-		{
-		case lw:
-			return "lw";
-		case sw:
-			return "sw";
-		case sb:
-			return "sb";
-		case li:
-			return "li";
-		case la:
-			return "la";
-		case jal:
-			return "jal";
-		case add:
-			return "add";
-		case sub:
-			return "sub";
-		case mul:
-			return "mul";
-		case MipsCode::divi:
-			return "div";
-		case neg:
-			return "neg";
-		case beq:
-			return "beq";
-		case bne:
-			return "bne";
-		case bge:
-			return "bge";
-		case bgt:
-			return "bgt";
-		case ble:
-			return "ble";
-		case blt:
-			return "blt";
-		case bnez:
-			return "bnez";
-		case beqz:
-			return "beqz";
-		case syscall:
-			return "syscall";
-		case MipsCode::move:
-			return "move";
-		case j:
-			return "j";
-		case jr:
-			return "jr";
-		case comment:
-			return "#";
-		default:
-			return "null";
-		}
-	}
-	std::string getInstr() {
-		return op + " " + des + " " + src1 + " " + src2;
-	}
-};
 class MipsInstrGen
 {
     public:
