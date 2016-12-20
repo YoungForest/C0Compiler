@@ -122,7 +122,7 @@ void MipsInstrGen::lss(QuaterInstr * current, MipsCode _op)
 
 void MipsInstrGen::dss(QuaterInstr * current, MipsCode _op)
 {
-	const string divi0 = "divi0errorMessage";
+	const string divi0 = "divi0error";
 	string t0 = "$t0";
 	string t1 = "$t1";
 	string t2 = "$t2";
@@ -209,7 +209,7 @@ void MipsInstrGen::dss(QuaterInstr * current, MipsCode _op)
 void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 {
 	vector<QuaterInstr*>::iterator it = middleCodes.begin();
-	const string arrayOutOfRange = "arrayOutOfRangeMeaage";
+	const string arrayOutOfRange = "arrayOutOfRange";
 	// 所使用的3个寄存器
 	string t0 = "$t0";
 	string t1 = "$t1";
@@ -573,7 +573,6 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 		default:
 			break;
 		}
-
 		it++;
 	}
 }

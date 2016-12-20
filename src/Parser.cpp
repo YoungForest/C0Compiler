@@ -128,7 +128,7 @@ void Parser::parser(string fileout)
 		fstream fo(fileout, ios::out);
 #ifdef VS
 		// print date and time, make it easier to debug
-		fo << "# generate time: " << __TIME__ << " " << __DATE__;
+		fo << "# generate time: " << __TIME__ << " " << __DATE__ << endl;
 #endif // VS
 		// print data segament
 		fo << ".data" << endl;
@@ -1201,6 +1201,13 @@ void Parser::assignStatement(string ident)
 	{
 		laxer.getsym();
 		struct symbolItem* index = expression();
+		if (index->kind == CONSTANT)	// 如果下标是常数, 进行越界检查
+		{
+			if (index->valueoroffset < 0 || index->valueoroffset >= des->length)
+			{
+				errorGenerate(118, to_string(index->valueoroffset));
+			}
+		}
 		if (laxer.sym == RSQUARE)
 		{
 			laxer.getsym();
@@ -1535,6 +1542,13 @@ struct symbolItem* Parser::factor()
 				{
 					laxer.getsym();
 					struct symbolItem* re = localTable.generateTemp();
+					if (item1->kind == CONSTANT)	// 如果下标是常数, 进行越界检查
+					{
+						if (item1->valueoroffset < 0 || item1->valueoroffset >= f->length)
+						{
+							errorGenerate(118, to_string(item1->valueoroffset));
+						}
+					}
 					middleCode.gen(Opcode::LAV, re, f, item1);
 					return re;
 				}

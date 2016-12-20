@@ -102,6 +102,7 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
 	case 112: Message << message1 << " at the left of = is not assignable!" << endl; break;
 	case 114: Message << "function parameter has the same name with function " << message1 << endl; break;
 	case 116: Message << "undefined function name " << message1 << endl;
+	case 118: Message << "Index of array '" << message1 << "' is out of range" << endl; break;
 	default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
     }
