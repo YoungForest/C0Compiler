@@ -62,7 +62,7 @@ void Error::errorMessage(int errortype,int line, int column) {
 	case 58: Message << "expected a return" << endl; break;
 	case 60: Message << "expected a identifier or interger or charactor or function call or '(' here" << endl; break;
     case 61: Message << "Divide by constant 0" << endl; break;
-	case 63: Message << "need array before '['" << endl; break;
+	case 62: Message << "expected a '[' here" << endl; break;
 	default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
     }

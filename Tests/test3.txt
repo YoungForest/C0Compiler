@@ -1,0 +1,28 @@
+// 1. 数组名作为函数形参
+// 2. void 函数有返回值
+// 3. lw $t1, 100($t2) 格式错误
+// 字符和数字运算
+int func0(char a)
+{
+
+}
+
+int func1(int a, int b)
+{
+
+}
+
+void func2(int u, int v)
+{
+
+}
+
+void func3(char u, char v)
+{
+
+}
+
+void main()
+{
+
+}

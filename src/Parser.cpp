@@ -1521,44 +1521,56 @@ struct symbolItem* Parser::factor()
 		string ident = laxer.getToken();
 		f = test(ident);
 		laxer.getsym();
-		if (laxer.sym == LSQUARE)
+		if (f->length > 0 && f->kind == VARIABLE)	// 数组
 		{
-			if (f->length <= 0)
-				errorGenerate(63);
-			laxer.getsym();
-			struct symbolItem* item1 = expression();
-			if (laxer.sym == RSQUARE)
+			if (laxer.sym == LSQUARE)
 			{
 				laxer.getsym();
-				struct symbolItem* re = localTable.generateTemp();
-				middleCode.gen(Opcode::LAV, re, f, item1);
-				return re;
-			}
-			else
-			{
-				errorGenerate(24);
-			}
-		}
-		else if (laxer.sym == LPARENT)
-		{
-			if (f->kind == FUNCTION)
-			{
-				if (f->type == CHAR_TYPE || f->type == INT_TYPE)
+				struct symbolItem* item1 = expression();
+				if (laxer.sym == RSQUARE)
 				{
-					return callFunction(ident);
+					laxer.getsym();
+					struct symbolItem* re = localTable.generateTemp();
+					middleCode.gen(Opcode::LAV, re, f, item1);
+					return re;
 				}
 				else
 				{
-					errorGenerate(108, f->name);
-					return localTable.generateTempConstant(108, INT_TYPE);
+					errorGenerate(24);
 				}
 			}
 			else
 			{
-				errorGenerate(110, f->name);
+				errorGenerate(62);
 			}
 		}
-		else
+		else if (f->kind == FUNCTION) // 函数
+		{
+			if (laxer.sym == LPARENT)
+			{
+				if (f->kind == FUNCTION)
+				{
+					if (f->type == CHAR_TYPE || f->type == INT_TYPE)
+					{
+						return callFunction(ident);
+					}
+					else
+					{
+						errorGenerate(108, f->name);
+						return localTable.generateTempConstant(108, INT_TYPE);
+					}
+				}
+				else
+				{
+					errorGenerate(110, f->name);
+				}
+			}
+			else
+			{
+				errorGenerate(12);
+			}
+		}
+		else // 普通变量 或 参数
 		{
 			return f;
 		}
