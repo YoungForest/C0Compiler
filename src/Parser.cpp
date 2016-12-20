@@ -1345,9 +1345,12 @@ void Parser::read()
 			{
 				string ident = laxer.getToken();
 				struct symbolItem* re = test(ident);
+                if (!(re->kind == VARIABLE || re->kind == PARAMETER))
+                {
+                    errorGenerate(67);
+                }
 				middleCode.gen(Opcode::READ, re);
 				laxer.getsym();
-
 				while (laxer.sym == COMMA)
 				{
 					laxer.getsym();
@@ -1355,6 +1358,10 @@ void Parser::read()
 					{
 						string ident = laxer.getToken();
 						struct symbolItem* re = test(ident);
+                        if (!(re->kind == VARIABLE || re->kind == PARAMETER))
+                        {
+                            errorGenerate(67);
+                        }
 						middleCode.gen(Opcode::READ, re);
 						laxer.getsym();
 					}

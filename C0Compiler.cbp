@@ -41,6 +41,7 @@
 		<Unit filename="include/Block.h" />
 		<Unit filename="include/DAGmanager.h" />
 		<Unit filename="include/Error.h" />
+		<Unit filename="include/Instruction.h" />
 		<Unit filename="include/Laxer.h" />
 		<Unit filename="include/MiddleCode.h" />
 		<Unit filename="include/MipsInstrGen.h" />
@@ -50,6 +51,7 @@
 		<Unit filename="src/Block.cpp" />
 		<Unit filename="src/DAGmanager.cpp" />
 		<Unit filename="src/Error.cpp" />
+		<Unit filename="src/Instruction.cpp" />
 		<Unit filename="src/Laxer.cpp" />
 		<Unit filename="src/MiddleCode.cpp" />
 		<Unit filename="src/MipsInstrGen.cpp" />
