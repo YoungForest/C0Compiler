@@ -81,7 +81,7 @@ struct symbolItem* Parser::test(string ident)
 		if (re == NULL)
 		{
 			errorGenerate(103, ident);
-			re = globalTable.insertItem(ident, laxer.linenum, VARIABLE, INT_TYPE, 0, laxer.num);
+			re = globalTable.insertItem(ident, laxer.linenum, VARIABLE, INT_TYPE, 0, laxer.num);	// 如果未找到, 容错处理
 		}
 	}
 	return re;
@@ -139,10 +139,11 @@ void Parser::parser(string fileout)
 		// runtime error message
 		fo << "divi0errorMessage: .asciiz \"Runtime Error: divide by 0.\"" << endl;
 		fo << "arrayOutOfRangeMeaage: .asciiz \"Runtime Error: the index of array is out of range.\"" << endl;
-		// print test segament
+		// print text segament
 		fo << ".text" << endl;
 		fo << "move $fp, $sp" << endl;
 		fo << "j end" << endl;
+		// runtime error process
 		fo << "divi0error:" << endl;
 		fo << "li $v0 4" << endl;
 		fo << "la $a0 divi0errorMessage" << endl;
@@ -153,8 +154,10 @@ void Parser::parser(string fileout)
 		fo << "la $a0 arrayOutOfRangeMeaage" << endl;
 		fo << "syscall" << endl;
 		fo << "j endOfAll" << endl;
+		// 生成的目标代码
 		for (int i = 0; i < mipsInstrGen.finalCodes.size(); i++)
 			fo << mipsInstrGen.finalCodes[i].getInstr() << endl;
+		// 程序结束控制指令
 		fo << "end:" << endl;
 		fo << "jal main" << endl;
 		fo << "endOfAll:" << endl;
@@ -182,7 +185,7 @@ void Parser::program()
 			else if (laxer.sym == LPARENT)
 			{
 				defineReturnFunction(type, ident);
-				break;
+				break;	// 跳出循环, 函数声明后只能有其他函数声明和main函数
 			}
 			else
 			{
@@ -915,10 +918,14 @@ void Parser::condition(struct symbolItem *&cmp1, struct symbolItem* &cmp2, int &
 		laxer.getsym();
 		cmp2 = expression();
 	}
-	else
+	else if (laxer.sym == RPARENT)
 	{
 		cmpOp = NULL;
 		cmp2 = NULL;
+	}
+	else
+	{
+		errorGenerate(68);
 	}
 	parserTestPrint("condition");
 }

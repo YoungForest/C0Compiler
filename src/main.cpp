@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 	}
 #ifdef VS
 	// print date and time, make it easier to debug
-	cout << "# generate time: " << __TIME__ << " " << __DATE__;
+	cout << "# generate time: " << __TIME__ << " " << __DATE__ << endl;
 #endif // VS
 
 #ifdef CB
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	fileout = argv[2];
 
 	Parser *parser0 = new Parser(filein);
-    parser0->parser(fileout);
+	parser0->parser(fileout);
 #ifdef CB
 	system("pause");
 #endif // CB

@@ -66,6 +66,7 @@ void Error::errorMessage(int errortype,int line, int column) {
 	case 63: Message << "void function return something" << endl; break;
     case 65: Message << "char or int function return nothing" << endl; break;
 	case 67: Message << "scanf only accept variable or parameter" << endl; break;
+	case 68: Message << "format error in condition" << endl; break;
 
 	default: Message << "Unhandled error " << errortype << " !" << endl;
         break;
