@@ -1,0 +1,50 @@
+
+const char a='a', m='m', z='z',A='A',M='M',Z='Z',w='w',e='e',F='F',II='I';
+
+char c1, c2;
+int i1, i2, i3;
+int ordc1, i;
+void main()
+{
+    for (i=1; i<3; i=i+1)
+    {
+        if (i==1)
+        {
+            c1 = w;
+            c2 = e;
+            i1 = 1;
+            i2 = 2;
+        }
+        if (i==2)
+        {
+            c1 = F;
+            c2 = II;
+            i1 = 3;
+            i2 = 5;
+        }
+        if ( c1 >= a)
+            if (c2 <= m)
+            {
+                ordc1 = c1 - a + 97;
+                printf(" The ASCII of c1 is", ordc1);
+            }
+            else
+                printf(" The frist letter is after m");
+        else
+            if (c1 >= A)
+                if (c1 <=M)
+                {
+                    ordc1 = c1 -A + 65;
+                    printf("The ASCII of c1 is ", ordc1);
+                }
+                else
+                    printf(" The first letter is after M");
+                else
+                    printf("The letter you in put is invalid\n ");
+        if (c1 <= c2)
+            i3 = (a*i1+m*i2)/ (a + m);
+        else
+            i3 = (a*i2+m*i1)/(a-m);
+        printf(" The result is : ", i3);
+    }
+}

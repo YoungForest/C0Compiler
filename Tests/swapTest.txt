@@ -1,0 +1,23 @@
+int a [5];
+int c, d;
+
+void swap ( int a , int      b)
+{
+    int c;
+    c = a;
+    a = b;
+    b = c;
+    printf(a);
+    printf(b);
+}
+
+void main()
+{
+    scanf(c);
+    scanf(d);
+    a[1] = c;
+    a[2] = d;
+    swap(a[1], a[2]);
+    printf(a[1]);
+    printf(a[2]);
+}
