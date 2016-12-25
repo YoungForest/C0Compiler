@@ -59,6 +59,8 @@ struct symbolItem* SymbolTable::insertItem(string name, int line, int kind, int 
             grow *= 4;  // change 1 to 4 for more easy deal
         else if (item->type == INT_TYPE)
             grow *= 4;
+        else
+            grow *= 4;;
         item->valueoroffset = - offset;
         offset += grow;
     }
