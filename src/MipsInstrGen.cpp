@@ -241,7 +241,10 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 					cout << "Index of array is out of range" << endl;	// not accessable
 					exit(0);
 				}
-				appendInstruction(MipsCode::lw, t0, current->src1->name + "+" + to_string(4 * current->src2->valueoroffset));
+				if (current->src2->valueoroffset == 0)
+					appendInstruction(MipsCode::lw, t0, current->src1->name);
+				else
+					appendInstruction(MipsCode::lw, t0, current->src1->name + "+" + to_string(4 * current->src2->valueoroffset));
 			}
 			else if (current->src1->scope == GLOBAL && current->src2->kind != CONSTANT)
 			{
@@ -306,7 +309,10 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 						cout << "Index of array is out of range" << endl;	// not accessable
 						exit(0);
 					}
-					appendInstruction(MipsCode::sw, t0, current->src1->name + "+" + to_string(4 * current->src2->valueoroffset));
+					if (current->src2->valueoroffset == 0)
+						appendInstruction(MipsCode::sw, t0, current->src1->name);
+					else
+						appendInstruction(MipsCode::sw, t0, current->src1->name + "+" + to_string(4 * current->src2->valueoroffset));
 				}
 				else
 				{
