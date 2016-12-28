@@ -121,9 +121,12 @@ void DAGmanager::buildDAG()
 			k = findSrcInSymbolList((*it)->src1);
 			updateDesInSymbolList((*it)->des, k);
 		}
-		else if ((*it)->op == Opcode::LAV)
+		else if ((*it)->op == Opcode::LAV)	// a = b[c], left node b, right node c, root node a;
 		{
-
+			left = findSrcInSymbolList((*it)->src1);
+			right = findSrcInSymbolList((*it)->src2);
+			k = findOprator((*it)->getOpcode(), left, right);
+			updateDesInSymbolList((*it)->des, k);
 		}
 		else
 		{
