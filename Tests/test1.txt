@@ -1,0 +1,78 @@
+const int max_int = 16;
+int list[16];
+
+int  getn(int x)
+{
+    if (x <= 0)
+        return (x);
+    if (x > 0)
+        return (getn(x - 1) + 1);
+    return (0);
+}
+
+void quicksort(int i, int j)
+{
+    int x, y, z;
+    int tmp;
+
+    x = i;
+    y = j;
+    z = list[(i + j) / 2];
+    do
+    {
+        do
+            if (z < list[y])
+
+                y = y - 1;
+        while (z < list[y]);
+
+        do
+            if (z > list[x])
+                x = x + 1;
+        while (z > list[x]);
+
+        if (x <= y)
+        {
+            tmp = list[x];
+            list[x] = list[y];
+            list[y] = tmp;
+            x = x + 1;
+            y = y - 1;
+        }
+    }
+    while (x <= y);
+    if (x < j) quicksort(x, j);
+    if (i < y) quicksort(i, y);
+}
+
+void printlist(int max)
+{
+    int i;
+    for (i = 0; i < max_int; i = i + 1)
+        if (i == 1)
+            printf(" ", list[i]);
+        else if (i == 7)
+            printf(" ", list[i]);
+        else if (i == 13)
+            printf(" ", list[i]);
+        else
+            ;
+}
+
+void main()
+{
+    int i;
+    for (i = 0; i < getn(max_int); i = i + 2)
+    {
+        list[i] = i * 13;
+    }
+    for (i = getn(max_int - 1); i >= 0; i = i - 2)
+    {
+        list[i] = (max_int - i) * 13;
+    }
+    printf("before : ");
+    printlist(max_int);
+    quicksort(0, max_int - 1);
+    printf("after : ");
+    printlist(max_int);
+}
