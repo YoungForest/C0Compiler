@@ -155,11 +155,13 @@ void MipsInstrGen::dss(QuaterInstr * current, MipsCode _op)
 	{
 		if (_op != MipsCode::divi)
 		{
+			appendInstruction(MipsCode::li, t1, to_string(current->src1->valueoroffset));
 			if (current->src2->scope == GLOBAL)
 				appendInstruction(MipsCode::lw, t2, current->src2->name);
 			else
 				appendInstruction(MipsCode::lw, t2, to_string(current->src2->valueoroffset) + "($fp)");
-			appendInstruction(_op, t0, t2, to_string(current->src1->valueoroffset));
+			appendInstruction(_op, t0, t1, t2);
+			//appendInstruction(_op, t0, t2, to_string(current->src1->valueoroffset));
 		}
 		else
 		{
