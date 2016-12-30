@@ -12,7 +12,7 @@ enum MipsCode
 	add,
 	sub,
 	mul,
-	divi,
+	divi,	// 由于div是codeblocks TDM-GCC 库函数里的一个函数, 在codeblocks中会出现重复定义的build错误, 所以改为divi但getOp时仍获得div, 保持与Mars的一致性
 	neg,
 	jal,
 	j,

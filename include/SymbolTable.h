@@ -12,7 +12,7 @@ struct symbolItem
     int kind;   // 符号的类型, 常量, 变量, 函数, 参数
     int type;   // int or char or void
     int valueoroffset;    // 值, 如果是常量的话 or 相对基地址偏移, 如果是变量或数组的话
-    int length; // 数组长度, or 函数参数数量
+    int length; // 数组长度 or 函数参数数量
 	int scope; // 全局或局部变量
 };
 class SymbolTable
@@ -30,10 +30,10 @@ class SymbolTable
 		
 		std::vector<struct symbolItem*> symbolList;
 		int offset;
+		int scope;
 
     protected:
     private:
-		int scope;
 };
 
 #define BASE_OFFSET 40	// 参数区开始偏移

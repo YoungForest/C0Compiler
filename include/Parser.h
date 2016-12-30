@@ -8,6 +8,8 @@
 #include "MipsInstrGen.h"
 #include "Error.h"
 
+#define FRAME_LEN 1000
+
 class Parser
 {
     public:
@@ -15,7 +17,8 @@ class Parser
         virtual ~Parser();
 
         void parser(std::string fileout);
-        void functionIn(std::string s);
+		void generateFinalCode();	// 生成目标代码, 控制优化开关
+		void functionIn(std::string s);
         void parserTestPrint(std::string s);  // [调试] 语法分析程序测试程序, 输出 语法成分
 		struct symbolItem* test(std::string ident);	// 测试标识符是否在符号表中
 		void test2(std::string ident, SymbolTable *st);	// 变量定义, 检查是否重复定义

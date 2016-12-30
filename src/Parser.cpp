@@ -113,6 +113,8 @@ void Parser::parser(string fileout)
 	else
 	{
 		cout << endl << "Compiled success!" << endl;
+		mipsInstrGen.holeOptimize();	// 窥孔优化
+
 		// 将全局变量输出到.data缓冲数组中
 		vector<struct symbolItem*>::iterator it = globalTable.symbolList.begin();
 		while (it != globalTable.symbolList.end())
@@ -162,6 +164,20 @@ void Parser::parser(string fileout)
 		fo << "jal main" << endl;
 		fo << "endOfAll:" << endl;
 	}
+}
+
+void Parser::generateFinalCode()
+{
+	if (error_handler.isSuccess())
+	{
+#ifdef OPTIMIZE
+		middleCode.optimize();
+#endif // OPTIMIZE
+		middleCode.printMiddleCode();
+		mipsInstrGen.generateInstruction(middleCode.middle_codes);
+	}
+	middleCode.clear();
+	localTable.clear();
 }
 
 // <程序>    ::= ［<常量说明>］［<变量说明>］{(int|char) <标识符> <有返回值函数定义>| void <无返回值函数定义>} void <主函数>
@@ -287,16 +303,7 @@ void Parser::defineVoidFunction()
 		}
 	}
 	middleCode.gen(Opcode::RET);
-	if (error_handler.isSuccess())
-	{
-#ifdef OPTIMIZE
-		middleCode.optimize();
-#endif // OPTIMIZE
-		middleCode.printMiddleCode();
-		mipsInstrGen.generateInstruction(middleCode.middle_codes);
-	}
-	middleCode.clear();
-	localTable.clear();
+	generateFinalCode();
 }
 
 // <有返回值函数定义>  ::= '(' <参数表>‘)’ ‘{’<复合语句>‘}’
@@ -346,16 +353,7 @@ void Parser::defineReturnFunction(int type, string ident)
 		errorGenerate(12);
 	}
 	middleCode.gen(Opcode::RET);
-	if (error_handler.isSuccess())
-	{
-#ifdef OPTIMIZE
-		middleCode.optimize();
-#endif // OPTIMIZE
-		middleCode.printMiddleCode();
-		mipsInstrGen.generateInstruction(middleCode.middle_codes);
-	}
-	middleCode.clear();
-	localTable.clear();
+	generateFinalCode();
 }
 
 // <复合语句>   :: = ［<常量说明>］［<变量说明>］<语句列>
@@ -372,9 +370,10 @@ void Parser::compoundStatement()
 	}
 	//int offset = localTable.offset;
 #ifdef OPTIMIZE
-	middleCode.gen(Opcode::DSP, to_string(localTable.offset));
+	middleCode.gen(Opcode::DSP, to_string(FRAME_LEN));
+	//middleCode.gen(Opcode::DSP, to_string(localTable.offset));
 #else
-	middleCode.gen(Opcode::DSP, "1500");
+	middleCode.gen(Opcode::DSP, to_string(FRAME_LEN));
 #endif // OPTIMIZE
 	statementList();
 	parserTestPrint("compound statement");
@@ -636,16 +635,7 @@ void Parser::mainFunction()
 		}
 	}
 	middleCode.gen(Opcode::RET);
-	if (error_handler.isSuccess())
-	{
-#ifdef OPTIMIZE
-		middleCode.optimize();
-#endif // OPTIMIZE
-		middleCode.printMiddleCode();
-		mipsInstrGen.generateInstruction(middleCode.middle_codes);
-	}
-	middleCode.clear();
-	localTable.clear();
+	generateFinalCode();
 }
 
 // <常量说明> :: = const<常量定义>; { const<常量定义>; }
