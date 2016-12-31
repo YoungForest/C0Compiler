@@ -59,7 +59,7 @@ void MiddleCode::printMiddleCode()
 {
 #ifdef PRINT_MIDDLECODE
     vector<QuaterInstr*>::iterator it = middle_codes.begin();
-    while (it != middle_codes.end()) 
+    while (it != middle_codes.end())
 	{
         (*it)->printQuater();
         it++;

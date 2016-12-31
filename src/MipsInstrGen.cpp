@@ -30,7 +30,7 @@ void MipsInstrGen::holeOptimize()
 	lw $t0 -40($sp)
 	可以删掉第二条语句
 	*/
-	for (auto it = finalCodes.begin(); it + 1 != finalCodes.end(); it++)
+	for (auto it = finalCodes.begin(); it + 1 != finalCodes.end() && it != finalCodes.end(); it++)
 	{
 		auto after = it + 1;
 		while (((*it).des == (*after).des && (*it).src1 == (*after).src1 && (*it).src2 == (*after).src2) && (((*it).op == "lw" && (*after).op == "sw") || ((*it).op == "sw" && (*after).op == "lw")))

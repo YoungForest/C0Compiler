@@ -8,7 +8,7 @@
 #include "MipsInstrGen.h"
 #include "Error.h"
 
-#define FRAME_LEN 1000
+#define FRAME_LEN 500
 
 class Parser
 {

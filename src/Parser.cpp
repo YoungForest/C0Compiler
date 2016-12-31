@@ -113,7 +113,6 @@ void Parser::parser(string fileout)
 	else
 	{
 		cout << endl << "Compiled success!" << endl;
-		mipsInstrGen.holeOptimize();	// 窥孔优化
 
 		// 将全局变量输出到.data缓冲数组中
 		vector<struct symbolItem*>::iterator it = globalTable.symbolList.begin();
@@ -157,6 +156,7 @@ void Parser::parser(string fileout)
 		fo << "syscall" << endl;
 		fo << "j endOfAll" << endl;
 		// 生成的目标代码
+		mipsInstrGen.holeOptimize();	// 窥孔优化
 		for (int i = 0; i < mipsInstrGen.finalCodes.size(); i++)
 			fo << mipsInstrGen.finalCodes[i].getInstr() << endl;
 		// 程序结束控制指令
@@ -1542,6 +1542,8 @@ struct symbolItem* Parser::factor()
 			{
 				laxer.getsym();
 				struct symbolItem* item1 = expression();
+				if (item1 == NULL)
+                    item1 = localTable.generateTemp();
 				if (laxer.sym == RSQUARE)
 				{
 					laxer.getsym();

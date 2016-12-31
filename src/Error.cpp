@@ -80,12 +80,14 @@ void Error::errorMessage(int errortype,int line, int column) {
 #endif // CB
 	exit(0);
 #endif
-	if (errortype % 2 == 0) 
+/*
+	if (errortype % 2 == 0)
 	{
 		printWarnings();
 		printErrors();
 		exit(0);
 	}
+	*/
 }
 
 void Error::errorMessage(int errortype, int line, int column, string message1) {
@@ -109,7 +111,7 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
         break;
     }
     error_messages.push_back(Message.str());
-
+/*
 	if (errortype == 102 || errortype == 110 || errortype == 116)
 	{
 		printWarnings();
@@ -127,6 +129,7 @@ void Error::errorMessage(int errortype, int line, int column, string message1) {
 #endif // CB
 	exit(0);
 #endif
+*/
 }
 
 void Error::errorMessage(int errortype, int line, int column, string message1, string message2) {
