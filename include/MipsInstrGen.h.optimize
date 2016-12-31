@@ -1,0 +1,76 @@
+#ifndef MIPSINSTRGEN_H
+#define MIPSINSTRGEN_H
+
+#include <string>
+#include <vector>
+#include "QuaterInstr.h"
+#include "Block.h"
+#include "Error.h"
+#include "Instruction.h"
+#include "TemporaryRegistesrPool.h"
+
+// useless until now
+enum Register
+{
+    $zero,
+    $at,
+    $v0,
+
+    $v1,
+    $a0,
+    $a1,
+    $a2,
+    $a3,
+    
+    $s0,
+    $s1,
+    $s2,
+    $s3,
+    $s4,
+    $s5,
+    $s6,
+    $s7,
+
+    // 保留给操作系统(我) ? 全局变量 ?
+    $k0,
+    $k1,
+
+    $gp,
+    $sp,
+    $fp,
+
+    $ra,
+};
+
+class MipsInstrGen
+{
+    public:
+        MipsInstrGen(Error &_error_handle) : error_handle(_error_handle) { clearPool(); };
+        virtual ~MipsInstrGen();
+        MipsCode branchNeg(MipsCode _op);   // 分支指令取反
+        void appendInstruction(std::string label);  // 生成final code
+        void appendInstruction(MipsCode _op, std::string _des = "", std::string _src1 = "", std::string _src2 = "");
+        void generateInstruction(std::vector<Block *> &blocks); // 以基本块为单位生成目标代码
+        void generateInstruction(std::vector<QuaterInstr*>& middleCodes);   // 根据中间代码生成目标代码
+        void dss(QuaterInstr* current, MipsCode _op);   // dss 型四元式 des src src
+        void lss(QuaterInstr* current, MipsCode _op);   // lss 型四元式 label src src
+        std::string to_string(int i);   // 修复code blocks g++ (tdm-1) 4.7.1 bug
+        void holeOptimize();    // 窥孔优化
+        std::string getTempRegister(symbolItem *item);  // 获得临时寄存器
+        void saveWord(symbolItem *item, std::string value); // 将寄存器value中的值存储到item对应的内存区中
+        void loadWord(symbolItem *item, std::string value); // 加载寄存器value中的值, 从item对应的内存区中
+
+        std::string alloc(symbolItem *item);    // 从寄存器池中分配寄存器给符号表项
+        std::string search(symbolItem *item);   // 查询寄存器池中是否已有该符号表项
+        std::string getRegString(int r);    // 获取字符串形式的寄存器表示
+        void clearPool();   // 清空寄存器池, 函数返回前执行
+        void MipsInstrGen::saveandclearPool();  // 保存并清空寄存器池, 每次调用函数之前必须做
+
+        std::vector<Instruction> finalCodes;    // 目标代码缓冲区
+        Error& error_handle;      // 错误处理程序
+        TemporaryRegistesrPool pool;    // 临时寄存器池
+    protected:
+    private:
+};
+
+#endif // MIPSINSTRGEN_H

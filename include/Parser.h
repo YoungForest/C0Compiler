@@ -85,7 +85,6 @@ class Parser
         Laxer laxer;
 		std::vector<std::string> data_const_string;
 		std::vector<std::string> data_global_v;
-		std::vector<Instruction> finalCodes;
 		bool returnFlag;	// ture => char or int; false => void
 };
 

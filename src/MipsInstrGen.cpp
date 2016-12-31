@@ -18,10 +18,11 @@ string MipsInstrGen::to_string(int i)
 	string s = ss.str();
 	return s;
 }
+
 void MipsInstrGen::holeOptimize()
 {
 	/*
-	lw $t0 -40($fp) 
+	lw $t0 -40($fp)
 	sw $t0 -40($sp)
 	可以删掉第二条语句
 
@@ -29,7 +30,7 @@ void MipsInstrGen::holeOptimize()
 	lw $t0 -40($sp)
 	可以删掉第二条语句
 	*/
-	for (auto it = finalCodes.begin(); it+1 != finalCodes.end(); it++)
+	for (auto it = finalCodes.begin(); it + 1 != finalCodes.end(); it++)
 	{
 		auto after = it + 1;
 		while (((*it).des == (*after).des && (*it).src1 == (*after).src1 && (*it).src2 == (*after).src2) && (((*it).op == "lw" && (*after).op == "sw") || ((*it).op == "sw" && (*after).op == "lw")))
@@ -37,37 +38,6 @@ void MipsInstrGen::holeOptimize()
 			finalCodes.erase(after);
 			after = it + 1;
 		}
-	}
-}
-std::string MipsInstrGen::getTempRegister(symbolItem * item)
-{
-	string r;
-	r = pool.search(item);
-	if (r.empty())
-	{
-		r = pool.alloc(item);
-	}
-	return r;
-}
-void MipsInstrGen::saveWord(symbolItem * item, string value)
-{
-	if (item->scope == GLOBAL)
-		appendInstruction(MipsCode::sw, value, item->name);
-	else
-		appendInstruction(MipsCode::sw, value, to_string(item->valueoroffset) + "($fp)");
-}
-void MipsInstrGen::loadWord(symbolItem * item, std::string value)
-{
-	if (item->kind == CONSTANT)
-	{
-		appendInstruction(MipsCode::li, value, to_string(item->valueoroffset));
-	}
-	else
-	{
-		if (item->scope == GLOBAL)
-			appendInstruction(MipsCode::lw, value, item->name);
-		else
-			appendInstruction(MipsCode::lw, value, to_string(item->valueoroffset) + "($fp)");
 	}
 }
 // get the negition of a branch mips code;
@@ -265,11 +235,13 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 	vector<QuaterInstr*>::iterator it = middleCodes.begin();
 	const string arrayOutOfRange = "arrayOutOfRange";
 	// 所使用的3个寄存器
+	string t0 = "$t0";
+	string t1 = "$t1";
+	string t2 = "$t2";
 	while (it != middleCodes.end())
 	{
 		QuaterInstr* current = (*it);
-		const string k0 = "$k0";
-		const string k1 = "$k1";
+
 		// 由四元式生成目标代码
 		switch (current->op)
 		{
@@ -294,21 +266,21 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 					exit(0);
 				}
 				if (current->src2->valueoroffset == 0)
-					appendInstruction(MipsCode::lw, k0, current->src1->name);
+					appendInstruction(MipsCode::lw, t0, current->src1->name);
 				else
-					appendInstruction(MipsCode::lw, k0, current->src1->name + "+" + to_string(4 * current->src2->valueoroffset));
+					appendInstruction(MipsCode::lw, t0, current->src1->name + "+" + to_string(4 * current->src2->valueoroffset));
 			}
 			else if (current->src1->scope == GLOBAL && current->src2->kind != CONSTANT)
 			{
 				if (current->src2->scope == GLOBAL)
-					appendInstruction(MipsCode::lw, k1, current->src2->name);
+					appendInstruction(MipsCode::lw, t1, current->src2->name);
 				else
-					appendInstruction(MipsCode::lw, k1, to_string(current->src2->valueoroffset) + "($fp)");
+					appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
 				// 数组越界处理
-				appendInstruction(MipsCode::blt, k1, "0", arrayOutOfRange);
-				appendInstruction(MipsCode::bge, k1, to_string(current->src1->length), arrayOutOfRange);
-				appendInstruction(MipsCode::mul, k1, k1, "4");
-				appendInstruction(MipsCode::lw, k0, current->src1->name + "(" + k1 + ")");
+				appendInstruction(MipsCode::blt, t1, "0", arrayOutOfRange);
+				appendInstruction(MipsCode::bge, t1, to_string(current->src1->length), arrayOutOfRange);
+				appendInstruction(MipsCode::mul, t1, t1, "4");
+				appendInstruction(MipsCode::lw, t0, current->src1->name + "(" + t1 + ")");
 			}
 			else
 			{
@@ -319,27 +291,39 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 						cout << "Index of array is out of range" << endl;	// not accessable
 						exit(0);
 					}
-					appendInstruction(MipsCode::lw, k0, to_string(current->src1->valueoroffset - 4 * current->src2->valueoroffset) + "($fp)");
+					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset - 4 * current->src2->valueoroffset) + "($fp)");
 				}
 				else
 				{
 					if (current->src2->scope == GLOBAL)
-						appendInstruction(MipsCode::lw, k1, current->src2->name);
+						appendInstruction(MipsCode::lw, t1, current->src2->name);
 					else
-						appendInstruction(MipsCode::lw, k1, to_string(current->src2->valueoroffset) + "($fp)");
+						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
 					// 数组越界处理
-					appendInstruction(MipsCode::blt, k1, "0", arrayOutOfRange);
-					appendInstruction(MipsCode::bge, k1, to_string(current->src1->length), arrayOutOfRange);
-					appendInstruction(MipsCode::mul, k1, k1, "4");
-					appendInstruction(MipsCode::sub, k1, "$fp", k1);
-					appendInstruction(MipsCode::lw, k0, to_string(current->src1->valueoroffset) + "(" + k1 + ")");
+					appendInstruction(MipsCode::blt, t1, "0", arrayOutOfRange);
+					appendInstruction(MipsCode::bge, t1, to_string(current->src1->length), arrayOutOfRange);
+					appendInstruction(MipsCode::mul, t1, t1, "4");
+					appendInstruction(MipsCode::sub, t1, "$fp", t1);
+					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) + "(" + t1 + ")");
 				}
 			}
-			string r = getTempRegister(current->des);
-			appendInstruction(MipsCode::move, r, k0);
+			if (current->des->scope == GLOBAL)
+				appendInstruction(MipsCode::sw, t0, current->des->name);
+			else
+				appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) + "($fp)");
 			break;
 		case SAV:
-			auto r = getTempRegister(current->des);
+			if (current->des->kind == CONSTANT)
+			{
+				appendInstruction(MipsCode::li, t0, to_string(current->des->valueoroffset));
+			}
+			else
+			{
+				if (current->des->scope == GLOBAL)
+					appendInstruction(MipsCode::lw, t0, current->des->name);
+				else
+					appendInstruction(MipsCode::lw, t0, to_string(current->des->valueoroffset) + "($fp)");
+			}
 			if (current->src1->scope == GLOBAL)
 			{
 				if (current->src2->kind == CONSTANT)
@@ -350,21 +334,21 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 						exit(0);
 					}
 					if (current->src2->valueoroffset == 0)
-						appendInstruction(MipsCode::sw, r, current->src1->name);
+						appendInstruction(MipsCode::sw, t0, current->src1->name);
 					else
-						appendInstruction(MipsCode::sw, r, current->src1->name + "+" + to_string(4 * current->src2->valueoroffset));
+						appendInstruction(MipsCode::sw, t0, current->src1->name + "+" + to_string(4 * current->src2->valueoroffset));
 				}
 				else
 				{
 					if (current->src2->scope == GLOBAL)
-						appendInstruction(MipsCode::lw, k1, current->src2->name);
+						appendInstruction(MipsCode::lw, t1, current->src2->name);
 					else
-						appendInstruction(MipsCode::lw, k1, to_string(current->src2->valueoroffset) + "($fp)");
+						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
 					// 数组越界处理
-					appendInstruction(MipsCode::blt, k1, "0", arrayOutOfRange);
-					appendInstruction(MipsCode::bge, k1, to_string(current->src1->length), arrayOutOfRange);
-					appendInstruction(MipsCode::mul, k1, k1, "4");
-					appendInstruction(MipsCode::sw, r, current->src1->name + "(" + k1 + ")");
+					appendInstruction(MipsCode::blt, t1, "0", arrayOutOfRange);
+					appendInstruction(MipsCode::bge, t1, to_string(current->src1->length), arrayOutOfRange);
+					appendInstruction(MipsCode::mul, t1, t1, "4");
+					appendInstruction(MipsCode::sw, t0, current->src1->name + "(" + t1 + ")");
 				}
 			}
 			else
@@ -376,33 +360,57 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 						cout << "Index of array is out of range" << endl;	// not accessable
 						exit(0);
 					}
-					appendInstruction(MipsCode::sw, r, to_string(current->src1->valueoroffset - 4 * current->src2->valueoroffset) + "($fp)");
+					appendInstruction(MipsCode::sw, t0, to_string(current->src1->valueoroffset - 4 * current->src2->valueoroffset) + "($fp)");
 				}
 				else
 				{
 					if (current->src2->scope == GLOBAL)
-						appendInstruction(MipsCode::lw, k1, current->src2->name);
+						appendInstruction(MipsCode::lw, t1, current->src2->name);
 					else
-						appendInstruction(MipsCode::lw, k1, to_string(current->src2->valueoroffset) + "($fp)");
+						appendInstruction(MipsCode::lw, t1, to_string(current->src2->valueoroffset) + "($fp)");
 					// 数组越界处理
-					appendInstruction(MipsCode::blt, k1, "0", arrayOutOfRange);
-					appendInstruction(MipsCode::bge, k1, to_string(current->src1->length), arrayOutOfRange);
-					appendInstruction(MipsCode::mul, k1, k1, "4");
-					appendInstruction(MipsCode::sub, k1, "$fp", k1);
-					appendInstruction(MipsCode::sw, r, to_string(current->src1->valueoroffset) + "(" + k1 + ")");
+					appendInstruction(MipsCode::blt, t1, "0", arrayOutOfRange);
+					appendInstruction(MipsCode::bge, t1, to_string(current->src1->length), arrayOutOfRange);
+					appendInstruction(MipsCode::mul, t1, t1, "4");
+					appendInstruction(MipsCode::sub, t1, "$fp", t1);
+					appendInstruction(MipsCode::sw, t0, to_string(current->src1->valueoroffset) + "(" + t1 + ")");
 				}
 			}
 			break;
 		case NEG:
-			string r = getTempRegister(current->src1);
-			appendInstruction(MipsCode::neg, r, r);
-			string r1 = getTempRegister(current->des);
-			appendInstruction(MipsCode::move, r1, r);
+			if (current->src1->kind == CONSTANT)
+			{
+				appendInstruction(MipsCode::li, t0, to_string(-current->src1->valueoroffset));
+			}
+			else
+			{
+				if (current->src1->scope == GLOBAL)
+					appendInstruction(MipsCode::lw, t1, current->src1->name);
+				else
+					appendInstruction(MipsCode::lw, t1, to_string(current->src1->valueoroffset) + "($fp)");
+				appendInstruction(MipsCode::neg, t0, t1);
+			}
+			if (current->des->scope == GLOBAL)
+				appendInstruction(MipsCode::sw, t0, current->des->name);
+			else
+				appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) + "($fp)");
 			break;
 		case ASS:
-			string r = getTempRegister(current->src1);
-			string r1 = getTempRegister(current->des);
-			appendInstruction(MipsCode::move, r1, r);
+			if (current->src1->kind == CONSTANT)
+			{
+				appendInstruction(MipsCode::li, t0, to_string(current->src1->valueoroffset));
+			}
+			else
+			{
+				if (current->src1->scope == GLOBAL)
+					appendInstruction(MipsCode::lw, t0, current->src1->name);
+				else
+					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) + "($fp)");
+			}
+			if (current->des->scope == GLOBAL)
+				appendInstruction(MipsCode::sw, t0, current->des->name);
+			else
+				appendInstruction(MipsCode::sw, t0, to_string(current->des->valueoroffset) + "($fp)");
 			break;
 		case BGT:
 			lss(current, MipsCode::bgt);
@@ -430,8 +438,11 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 					;
 			else
 			{
-				string r = getTempRegister(current->src1);
-				appendInstruction(MipsCode::bnez, r, current->label);
+				if (current->src1->scope == GLOBAL)
+					appendInstruction(MipsCode::lw, t0, current->src1->name);
+				else
+					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) + "($fp)");
+				appendInstruction(MipsCode::bnez, t0, current->label);
 			}
 			break;
 		case BEZ:
@@ -442,8 +453,11 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 					;
 			else
 			{
-				string r = getTempRegister(current->src1);
-				appendInstruction(MipsCode::beqz, r, current->label);
+				if (current->src1->scope == GLOBAL)
+					appendInstruction(MipsCode::lw, t0, current->src1->name);
+				else
+					appendInstruction(MipsCode::lw, t0, to_string(current->src1->valueoroffset) + "($fp)");
+				appendInstruction(MipsCode::beqz, t0, current->label);
 			}
 			break;
 		case JUMP:
@@ -552,14 +566,18 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			{
 				if (current->des->type == INT_TYPE)
 				{
-					string r = getTempRegister(current->des);
-					appendInstruction(MipsCode::move, "$a0", r);
+					if (current->des->scope == GLOBAL)
+						appendInstruction(MipsCode::lw, "$a0", current->des->name);
+					else
+						appendInstruction(MipsCode::lw, "$a0", to_string(current->des->valueoroffset) + "($fp)");
 					appendInstruction(MipsCode::li, "$v0", "1");
 				}
 				else if (current->des->type == CHAR_TYPE)
 				{
-					string r = getTempRegister(current->des);
-					appendInstruction(MipsCode::move, "$a0", r);
+					if (current->des->scope == GLOBAL)
+						appendInstruction(MipsCode::lw, "$a0", current->des->name);
+					else
+						appendInstruction(MipsCode::lw, "$a0", to_string(current->des->valueoroffset) + "($fp)");
 					appendInstruction(MipsCode::li, "$v0", "11");
 				}
 				else
@@ -568,12 +586,19 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			appendInstruction(MipsCode::syscall);
 			break;
 		case PUSH:
-			string r = getTempRegister(current->des);
-			appendInstruction(MipsCode::sw, r, to_string(current->src1->valueoroffset) + "($sp)");
+			if (current->des->kind == CONSTANT)
+				appendInstruction(MipsCode::li, t0, to_string(current->des->valueoroffset));
+			else
+			{
+				if (current->des->scope == GLOBAL)
+					appendInstruction(MipsCode::lw, t0, current->des->name);
+				else
+					appendInstruction(MipsCode::lw, t0, to_string(current->des->valueoroffset) + "($fp)");
+			}
+			appendInstruction(MipsCode::sw, t0, to_string(current->src1->valueoroffset) + "($sp)");
 			break;
 		case PUT:
-			string r = getTempRegister(current->des);
-			appendInstruction(MipsCode::move, "$v0", r);
+			appendInstruction(MipsCode::sw, "$v0", to_string(current->des->valueoroffset) + "($fp)");
 			break;
 		default:
 			break;
