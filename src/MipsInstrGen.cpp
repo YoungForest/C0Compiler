@@ -145,9 +145,24 @@ void MipsInstrGen::lss(QuaterInstr * current, MipsCode _op)
 void MipsInstrGen::dss(QuaterInstr * current, MipsCode _op)
 {
 	const string divi0 = "divi0error";
-	string t0 = "$t0";
-	string t1 = "$t1";
-	string t2 = "$t2";
+	static string reg[] =
+	{
+	    "$t0",
+	    "$t1",
+	    "$t2",
+	    "$t3",
+	    "$t4",
+	    "$t5",
+	    "$t6",
+	    "$t7",
+	    "$t8",
+	    "$t9"
+	};
+	static int index = -1;
+	index = (index + 2) % 10;
+	string t0 = reg[index];
+	string t1 = reg[(index+1)%10];
+	string t2 = reg[(index+2)%10];
 	if (current->src1->kind == CONSTANT && current->src2->kind == CONSTANT)
 	{
 		switch (_op)
@@ -515,7 +530,7 @@ void MipsInstrGen::generateInstruction(vector<QuaterInstr*>& middleCodes)
 			appendInstruction(MipsCode::jr, "$ra");
 			break;
 		case DSP:
-			appendInstruction(MipsCode::sub, "$sp", "$sp", current->label);
+			appendInstruction(MipsCode::sub, "$sp", "$sp", to_string(offset));
 			break;
 		case READ:
 			if (current->des->type == INT_TYPE)

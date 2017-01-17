@@ -373,7 +373,7 @@ void Parser::compoundStatement()
 	middleCode.gen(Opcode::DSP, to_string(FRAME_LEN));
 	//middleCode.gen(Opcode::DSP, to_string(localTable.offset));
 #else
-	middleCode.gen(Opcode::DSP, to_string(FRAME_LEN));
+	middleCode.gen(Opcode::DSP);
 #endif // OPTIMIZE
 	statementList();
 	parserTestPrint("compound statement");

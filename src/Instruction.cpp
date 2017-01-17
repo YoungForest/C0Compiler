@@ -43,9 +43,9 @@ std::string Instruction::getOpName(MipsCode _opcode)
 	case jal:
 		return "jal";
 	case add:
-		return "add";
+		return "addu";
 	case sub:
-		return "sub";
+		return "subu";
 	case mul:
 		return "mul";
 	case MipsCode::divi:

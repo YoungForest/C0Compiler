@@ -57,7 +57,7 @@ void MiddleCode::clear()
 
 void MiddleCode::printMiddleCode()
 {
-#ifdef PRINT_MIDDLECODE
+ #ifdef PRINT_MIDDLECODE
     vector<QuaterInstr*>::iterator it = middle_codes.begin();
     while (it != middle_codes.end())
 	{
@@ -65,7 +65,7 @@ void MiddleCode::printMiddleCode()
         it++;
     }
 	cout << endl;
-#endif
+ #endif
 }
 
 void MiddleCode::optimize()

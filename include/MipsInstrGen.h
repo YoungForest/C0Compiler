@@ -55,7 +55,7 @@ enum Register
 class MipsInstrGen
 {
 public:
-	MipsInstrGen(Error &_error_handle) : error_handle(_error_handle) {};
+	MipsInstrGen(Error &_error_handle, int & _offset) : error_handle(_error_handle), offset(_offset) {};
 	virtual ~MipsInstrGen();
 	MipsCode branchNeg(MipsCode _op);	// 分支指令取反
 	void appendInstruction(std::string label);	// 生成final code
@@ -69,6 +69,7 @@ public:
 
 	std::vector<Instruction> finalCodes;	// 目标代码缓冲区
 	Error& error_handle;      // 错误处理程序
+	int & offset;
 protected:
 private:
 };
